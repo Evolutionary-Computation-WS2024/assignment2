@@ -36,19 +36,20 @@ public class Patch {
         Iterator<Integer> remaining_nodes_iterator = remaining_nodes.iterator();
         Extension best_found_extension = new Extension(this.tspInstance, starting_node, remaining_nodes_iterator.next(), this);
         
-        Node current_node = starting_node;
-        while (true) {
-            remaining_nodes_iterator = remaining_nodes.iterator();
-            while (remaining_nodes_iterator.hasNext()) {
-                Extension candidate = new Extension(this.tspInstance, current_node, remaining_nodes_iterator.next(), this);
+        remaining_nodes_iterator = remaining_nodes.iterator();
+        while (remaining_nodes_iterator.hasNext()){
+            int extra_node_id = remaining_nodes_iterator.next();
+            Node current_node = starting_node;
+            while (true) {
+                Extension candidate = new Extension(this.tspInstance, current_node, extra_node_id, this);
                 if (candidate.is_better(best_found_extension)) {
                     best_found_extension = candidate;
                 }
+                if (!current_node.hasNext()) {
+                    break;
+                }
+                current_node = current_node.getNext();
             }
-            if (!current_node.hasNext()) {
-                break;
-            }
-            current_node = current_node.getNext();
         }
         best_found_extension.add_to_the_patch();
         this.remaining_nodes.remove(best_found_extension.extra_node_id);
