@@ -53,6 +53,9 @@ public class Extension {
     }
     //compare
     public boolean is_better(Extension other) {
+        if (other == null) {
+            return true;
+        }
         return this.utility_difference < other.utility_difference;
     }
 }

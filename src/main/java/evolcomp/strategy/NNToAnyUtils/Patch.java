@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Collections;
 
 /**
  *
@@ -34,17 +35,27 @@ public class Patch {
     public void extend() {
         // initialize any solution for comaprison
         Iterator<Integer> remaining_nodes_iterator = remaining_nodes.iterator();
-        Extension best_found_extension = new Extension(this.tspInstance, starting_node, remaining_nodes_iterator.next(), this);
+        //WARNING it may be wrong
+        
+        List<Extension> best_extensions_for_every_remaining_node = new ArrayList<>();
+        
+        Extension best_found_extension = null;
+        Extension second_best_found_extension = null;
         
         remaining_nodes_iterator = remaining_nodes.iterator();
         while (remaining_nodes_iterator.hasNext()){
             int extra_node_id = remaining_nodes_iterator.next();
             Node current_node = starting_node;
+            best_found_extension = null;
+            second_best_found_extension = null;
             while (true) {
                 Extension candidate = new Extension(this.tspInstance, current_node, extra_node_id, this);
                 if (candidate.is_better(best_found_extension)) {
                     best_found_extension = candidate;
                 }
+                else if (candidate.is_better(second_best_found_extension)) {
+                    second_best_found_extension = candidate;
+                }                                
                 if (!current_node.hasNext()) {
                     break;
                 }
