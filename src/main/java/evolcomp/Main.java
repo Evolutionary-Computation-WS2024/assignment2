@@ -31,7 +31,6 @@ public class Main {
         strategies.add(new NNToAnyNodeStrategy(-1,0));
         strategies.add(new NNToAnyNodeStrategy(0,1));
         strategies.add(new NNToAnyNodeStrategy(-1,1));
-        strategies.add(new NNToAnyNodeStrategy(1,1));
         strategies.add(new NNToAnyNodeStrategy(-3,1));
         strategies.add(new NNToAnyNodeStrategy(-6,1));
         strategies.add(new NNToAnyNodeStrategy(-7,1));
