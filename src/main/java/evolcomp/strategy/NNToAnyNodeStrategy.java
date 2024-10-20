@@ -6,13 +6,15 @@ import evolcomp.strategy.NNToAnyUtils.Patch;
 
 
 public final class NNToAnyNodeStrategy extends Strategy {
-    public NNToAnyNodeStrategy() {}
+    public NNToAnyNodeStrategy(int utility_weight, int regret_weight) {
+        super(utility_weight,regret_weight);
+    }
     
     // TODO: Implement
     @Override
     public Cycle apply(final TSPInstance tspInstance, final int startNode) {
 
-        Patch patch = new Patch(startNode, tspInstance);
+        Patch patch = new Patch(startNode, tspInstance, this.regret_weight, this.utility_weight);
         
         for (int i = 1; i < tspInstance.getRequiredCycleLength(); i++) {
             patch.extend();
@@ -22,6 +24,7 @@ public final class NNToAnyNodeStrategy extends Strategy {
 
     @Override
     public String toString() {
-        return "Nearest Neighbor to Any Node";
+        String text = this.regret_weight+"*regret+("+this.utility_weight+")*best_objective_function";
+        return text;
     }
 }

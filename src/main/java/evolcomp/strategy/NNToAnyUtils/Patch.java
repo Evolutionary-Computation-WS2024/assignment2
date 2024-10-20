@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  *
@@ -20,8 +21,11 @@ public class Patch {
     public Node starting_node;
     private Set<Integer> remaining_nodes;
     private final TSPInstance tspInstance;
+    private final ExtensionComparator comparator;
+    public final int regret_weight;
+    public final int utility_weight;
     
-    public Patch(int starting_point, TSPInstance tspInstance) {
+    public Patch(int starting_point, TSPInstance tspInstance, int regret_weight, int utility_weight) {
         this.tspInstance = tspInstance;
         int no_nodes = tspInstance.getHowManyNodes();
         this.remaining_nodes = new HashSet<>();
@@ -31,6 +35,9 @@ public class Patch {
         
         this.starting_node = new Node(starting_point);
         this.remaining_nodes.remove(starting_point);
+        this.comparator = new ExtensionComparator();
+        this.regret_weight  =  regret_weight;
+        this.utility_weight = utility_weight;
     }
     public void extend() {
         // initialize any solution for comaprison
@@ -61,9 +68,12 @@ public class Patch {
                 }
                 current_node = current_node.getNext();
             }
+            best_extensions_for_every_remaining_node.add(best_found_extension);
+            best_found_extension.compute_2_regret(second_best_found_extension);
         }
-        best_found_extension.add_to_the_patch();
-        this.remaining_nodes.remove(best_found_extension.extra_node_id);
+        Extension selected_extension = Collections.max(best_extensions_for_every_remaining_node, this.comparator);
+        selected_extension.add_to_the_patch();
+        this.remaining_nodes.remove(selected_extension.extra_node_id);
     }
     public List<Integer> toList() {
         List<Integer> list = new ArrayList<>();

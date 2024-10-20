@@ -28,11 +28,14 @@ public class Main {
         }
 
         List<Strategy> strategies = new ArrayList<>();
-        strategies.add(new RandomStrategy(42));
-        strategies.add(new NNToEndStrategy());
-        strategies.add(new NNToAnyNodeStrategy());
-        strategies.add(new GreedyCycleStrategy());
-
+        strategies.add(new NNToAnyNodeStrategy(-1,0));
+        strategies.add(new NNToAnyNodeStrategy(0,1));
+        strategies.add(new NNToAnyNodeStrategy(-1,1));
+        strategies.add(new NNToAnyNodeStrategy(1,1));
+        strategies.add(new NNToAnyNodeStrategy(-3,1));
+        strategies.add(new NNToAnyNodeStrategy(-6,1));
+        strategies.add(new NNToAnyNodeStrategy(-7,1));
+        
         List<SolutionRow> solutions = new ArrayList<>();
 
         String delim = "|----------|-------------------------------------|----------|----------|----------|";
