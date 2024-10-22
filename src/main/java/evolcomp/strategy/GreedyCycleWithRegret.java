@@ -10,6 +10,7 @@ public final class GreedyCycleWithRegret extends Strategy {
         super(utility_weight,regret_weight);
     }
     
+    //this are comments concern assignment 3
     // TODO: Implement
     @Override
     public Cycle apply(final TSPInstance tspInstance, final int startNode) {
@@ -19,12 +20,17 @@ public final class GreedyCycleWithRegret extends Strategy {
         for (int i = 1; i < tspInstance.getRequiredCycleLength(); i++) {
             patch.extend();
         }
+        // solution = new Cycle(patch.toList());
+        //start measuring time
+        //apply local search to solution
+        // end measuring time
+        //return result of local search
         return new Cycle(patch.toList());
     }
 
     @Override
     public String toString() {
-        String text = this.regret_weight+"*regret+("+this.utility_weight+")*best_objective_function";
+        String text = this.regret_weight+"Xregret_plus("+this.utility_weight+")Xbest_objective_function";
         return text;
     }
 }

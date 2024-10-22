@@ -29,11 +29,11 @@ public class Main {
 
         List<Strategy> strategies = new ArrayList<>();
         strategies.add(new GreedyCycleWithRegret(-1,0));
-        strategies.add(new GreedyCycleWithRegret(0,1));
-        strategies.add(new GreedyCycleWithRegret(-1,1));
-        strategies.add(new GreedyCycleWithRegret(-3,1));
-        strategies.add(new GreedyCycleWithRegret(-6,1));
-        strategies.add(new GreedyCycleWithRegret(-7,1));
+        strategies.add(new GreedyCycleWithRegret(0,-1));
+        strategies.add(new GreedyCycleWithRegret(-1,-1));
+        strategies.add(new GreedyCycleWithRegret(-3,-1));
+        strategies.add(new GreedyCycleWithRegret(-6,-1));
+        strategies.add(new GreedyCycleWithRegret(-7,-1));
         
         List<SolutionRow> solutions = new ArrayList<>();
 
