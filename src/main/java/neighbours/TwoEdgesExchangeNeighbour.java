@@ -38,6 +38,12 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
             int secondEdgeStartingNodePositionIndexInRoute)
     {
         super(instance, currentSolution);
+
+        int distance = Math.abs(firstEdgeStartingNodePositionIndexInRoute - secondEdgeStartingNodePositionIndexInRoute);
+        if (distance < 2 || distance > currentSolution.nodes().size()-2) {
+            throw new IllegalArgumentException("Mówiłem, że miedzy pierwszym nodem każdegu edgu musi być min 1 node offesetu, żeby na siebie edge nie nachodziły");
+        }
+        
         this.A1Index = firstEdgeStartingNodePositionIndexInRoute;
         this.A2Index = secondEdgeStartingNodePositionIndexInRoute;
         this.B1Index = (A1Index + 1)%currentSolution.nodes().size();
