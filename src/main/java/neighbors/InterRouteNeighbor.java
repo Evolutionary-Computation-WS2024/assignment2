@@ -26,33 +26,8 @@ class InterRouteNeighbor extends NeighborStrategy {
 
     @Override
     public int evaluate() {
-        List<Integer> nodesList = this.currentSolution.nodes();
-        int lastNodeIndex = nodesList.size() - 1;
-        int prevNodeID, nextNodeID;
-        
-        if (nodePositionIndexInRoute != 0) {
-            prevNodeID = nodesList.get(nodePositionIndexInRoute - 1);     
-        } else {
-            prevNodeID = nodesList.get(lastNodeIndex);
-        }
-        if (nodePositionIndexInRoute != lastNodeIndex) {
-            nextNodeID = nodesList.get(nodePositionIndexInRoute + 1);     
-        } else {
-            nextNodeID = nodesList.get(0);
-        }
-        
-        int gains = this.instance.getCostAt(nodesList.get(this.nodePositionIndexInRoute));
-        int costs = this.instance.getCostAt(this.newNodeId);
-        
-        gains += this.instance.getDistanceBetween(prevNodeID, nodesList.get(this.nodePositionIndexInRoute));
-        gains += this.instance.getDistanceBetween(nextNodeID, nodesList.get(this.nodePositionIndexInRoute));
-        
-        costs +=  this.instance.getDistanceBetween(prevNodeID, newNodeId);
-        costs +=  this.instance.getDistanceBetween(nextNodeID, newNodeId);
-        
-        int delta = costs - gains;
-        this.evaluationResult = delta;
-        return delta;
+        this.evaluationResult = this.getNodeInsertionDelta(newNodeId, nodePositionIndexInRoute);
+        return evaluationResult;
     }
 
     @Override
