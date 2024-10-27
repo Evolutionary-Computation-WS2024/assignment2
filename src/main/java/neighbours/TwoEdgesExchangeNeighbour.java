@@ -66,7 +66,7 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
 
     @Override
     public Cycle buildNeighbour() {
-        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.nodes(),B1, A2);
+        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.nodes(),B1Index, A2Index);
         Cycle neighbour = new Cycle(neighbourAsList);
         this.ThisNeighbor = neighbour;
         return neighbour;
