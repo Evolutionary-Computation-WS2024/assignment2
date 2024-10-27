@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package neighbours;
 
 import evolcomp.tsp.Cycle;
@@ -9,11 +5,7 @@ import evolcomp.tsp.TSPInstance;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Jerzu
- */
-class InterRouteNeighbour extends NeighbourStrategy {
+public class InterRouteNeighbour extends NeighbourStrategy {
     private final int nodePositionIndexInRoute;
     private final int newNodeId;
 

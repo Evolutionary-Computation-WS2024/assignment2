@@ -1,17 +1,10 @@
 package neighbours;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
 import java.util.List;
-/**
- *
-    * @author Jerzu
- */
-abstract class NeighbourStrategy {
+
+public abstract class NeighbourStrategy {
     public int evaluationResult;
     public Cycle ThisNeighbor;
     protected final Cycle currentSolution;

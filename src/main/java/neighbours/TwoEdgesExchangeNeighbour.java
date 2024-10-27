@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package neighbours;
 
 import evolcomp.tsp.Cycle;
@@ -22,9 +18,9 @@ import java.util.List;
  * |       X       |
  * O -- B2   A2 -- O
  * 
- * @author Jerzu
+ * @author Jerzu, Siemieniuk
  */
-class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
+public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
     private final int A1Index;
     private final int A2Index;
     private final int B1Index;
