@@ -70,7 +70,7 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
     }
     @Override
     public Cycle buildNeighbour() {
-        List<Integer> nodesListCopy = new ArrayList (this.currentSolution.nodes());
+        List<Integer> nodesListCopy = new ArrayList<>(this.currentSolution.nodes());
         Collections.swap(nodesListCopy, this.firstNodePositionIndexInRoute, this.secondNodePositionIndexInRoute);
         return new Cycle(nodesListCopy);
     }

@@ -5,7 +5,6 @@
 package evolcomp.strategy.NNToAnyUtils;
 
 import evolcomp.tsp.TSPInstance;
-import evolcomp.strategy.NNToAnyUtils.Patch;
 
 /**
  *
@@ -20,8 +19,8 @@ public class Extension {
     private final int utility_weight;
     private int regret;
     private final TSPInstance instance;
-    private final Patch path;
-    public Extension(TSPInstance instance, evolcomp.strategy.NNToAnyUtils.Node anchor, int extra_node_id, Patch path) {
+    private final Path path;
+    public Extension(TSPInstance instance, evolcomp.strategy.NNToAnyUtils.Node anchor, int extra_node_id, Path path) {
         this.extra_node_id = extra_node_id;
         this.anchor = anchor;
         this.instance = instance;

@@ -2,12 +2,16 @@ package evolcomp.strategy;
 
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
-import evolcomp.strategy.NNToAnyUtils.Patch;    
+import evolcomp.strategy.NNToAnyUtils.Path;
 
 
 public final class GreedyCycleWithRegret extends Strategy {
+    private final int utility_weight;
+    private final int regret_weight;
+
     public GreedyCycleWithRegret(int utility_weight, int regret_weight) {
-        super(utility_weight,regret_weight);
+        this.utility_weight = utility_weight;
+        this.regret_weight = regret_weight;
     }
     
     //this are comments concern assignment 3
@@ -15,17 +19,17 @@ public final class GreedyCycleWithRegret extends Strategy {
     @Override
     public Cycle apply(final TSPInstance tspInstance, final int startNode) {
 
-        Patch patch = new Patch(startNode, tspInstance, this.regret_weight, this.utility_weight);
+        Path path = new Path(startNode, tspInstance, this.regret_weight, this.utility_weight);
         
         for (int i = 1; i < tspInstance.getRequiredCycleLength(); i++) {
-            patch.extend();
+            path.extend();
         }
         // solution = new Cycle(patch.toList());
         //start measuring time
         //apply local search to solution
         // end measuring time
         //return result of local search
-        return new Cycle(patch.toList());
+        return new Cycle(path.toList());
     }
 
     @Override

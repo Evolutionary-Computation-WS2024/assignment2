@@ -11,13 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Collections;
-import java.util.Comparator;
 
-/**
- *
- * @author User
- */
-public class Patch {
+public class Path {
     public Node starting_node;
     private Set<Integer> remaining_nodes;
     private final TSPInstance tspInstance;
@@ -25,7 +20,7 @@ public class Patch {
     public final int regret_weight;
     public final int utility_weight;
     
-    public Patch(int starting_point, TSPInstance tspInstance, int regret_weight, int utility_weight) {
+    public Path(int starting_point, TSPInstance tspInstance, int regret_weight, int utility_weight) {
         this.tspInstance = tspInstance;
         int no_nodes = tspInstance.getHowManyNodes();
         this.remaining_nodes = new HashSet<>();

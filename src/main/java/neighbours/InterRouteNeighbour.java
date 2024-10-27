@@ -24,7 +24,7 @@ public class InterRouteNeighbour extends NeighbourStrategy {
 
     @Override
     public Cycle buildNeighbour() {
-        List<Integer> nodesListCopy = new ArrayList (this.currentSolution.nodes());
+        List<Integer> nodesListCopy = new ArrayList<>(this.currentSolution.nodes());
         nodesListCopy.set(this.nodePositionIndexInRoute, newNodeId);
         return new Cycle(nodesListCopy);
     }

@@ -19,7 +19,6 @@ public final class RandomStrategy extends Strategy {
         this.rand = new Random(seed);
     }
 
-    // TODO: Implement
     @Override
     public Cycle apply(final TSPInstance tspInstance, final int startNode) {
         
