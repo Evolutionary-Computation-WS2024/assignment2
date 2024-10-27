@@ -18,7 +18,12 @@ class TwoNodesExchangeNeighbour extends NeighbourStrategy {
     private int firstNodePositionIndexInRoute;
     private int secondNodePositionIndexInRoute;
 
-    public TwoNodesExchangeNeighbour(TSPInstance instance, Cycle currentSolution, int firstNodePositionIndexInRoute, int secondNodePositionIndexInRoute) {
+    public TwoNodesExchangeNeighbour(
+            TSPInstance instance,
+            Cycle currentSolution,
+            int firstNodePositionIndexInRoute,
+            int secondNodePositionIndexInRoute)
+    {
         super(instance, currentSolution);
         // ensure that the first node is actually before the second (required for case 1 in evaluate)
         if (firstNodePositionIndexInRoute == 0 && secondNodePositionIndexInRoute == this.currentSolution.nodes().size()-1) {
@@ -48,7 +53,7 @@ class TwoNodesExchangeNeighbour extends NeighbourStrategy {
         //case 1 swap two consecutive nodes
         // O--O--A--B--O
         if (indexesDifference == 1 ||  indexesDifference == nodesList.size()-1) {
-            nextNodeID = nodesList.get((secondNodePositionIndexInRoute + 1)% (this.currentSolution.nodes().size()-1));
+            nextNodeID = nodesList.get((secondNodePositionIndexInRoute + 1)% (this.currentSolution.nodes().size()));
             if (firstNodePositionIndexInRoute == 0) {
                 prevNodeID = nodesList.get(this.currentSolution.nodes().size()-1);
             } else {
