@@ -30,6 +30,18 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
     private final int A2;
     private final int B1;
     private final int B2;
+
+    public TwoEdgesExchangeNeighbour() {
+        super();
+        this.A1Index = 0;
+        this.A2Index = 0;
+        this.B1Index = 0;
+        this.B2Index = 0;
+        this.A1 = -1;
+        this.A2 = -1;
+        this.B1 = -1;
+        this.B2 = -1;
+    }
     
     public TwoEdgesExchangeNeighbour(
             TSPInstance instance,
@@ -39,9 +51,8 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
     {
         super(instance, currentSolution);
 
-        int distance = Math.abs(firstEdgeStartingNodePositionIndexInRoute - secondEdgeStartingNodePositionIndexInRoute);
-        if (distance < 2 || distance > currentSolution.nodes().size()-2) {
-            throw new IllegalArgumentException("Mówiłem, że miedzy pierwszym nodem każdegu edgu musi być min 1 node offesetu, żeby na siebie edge nie nachodziły");
+        if (!isValid(firstEdgeStartingNodePositionIndexInRoute, secondEdgeStartingNodePositionIndexInRoute)) {
+            throw new IllegalArgumentException("Minimal distance between two entries must be 2!");
         }
         
         this.A1Index = firstEdgeStartingNodePositionIndexInRoute;
@@ -77,6 +88,13 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
         this.ThisNeighbor = neighbour;
         return neighbour;
     }
+
+    @Override
+    public boolean isValid(int first, int second) {
+        int distance = Math.abs(first - second);
+        return distance >= 2;
+    }
+
     /**
      * 
      * @param originalList
@@ -94,5 +112,15 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
             end = (end - 1 + n) % n;
         }
         return newList;
+    }
+
+    @Override
+    public TwoEdgesExchangeNeighbour construct(TSPInstance instance, Cycle currentSolution, int first, int second) {
+        return new TwoEdgesExchangeNeighbour(instance, currentSolution, first, second);
+    }
+
+    @Override
+    public String toString() {
+        return "2-Edges";
     }
 }

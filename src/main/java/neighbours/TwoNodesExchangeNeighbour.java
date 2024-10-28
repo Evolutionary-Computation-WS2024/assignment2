@@ -10,6 +10,10 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
     private int firstNodePositionIndexInRoute;
     private int secondNodePositionIndexInRoute;
 
+    public TwoNodesExchangeNeighbour() {
+        super();
+    }
+
     public TwoNodesExchangeNeighbour(
             TSPInstance instance,
             Cycle currentSolution,
@@ -68,10 +72,26 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
         this.evaluationResult = delta;
         return delta;
     }
+
     @Override
     public Cycle buildNeighbour() {
         List<Integer> nodesListCopy = new ArrayList<>(this.currentSolution.nodes());
         Collections.swap(nodesListCopy, this.firstNodePositionIndexInRoute, this.secondNodePositionIndexInRoute);
         return new Cycle(nodesListCopy);
+    }
+
+    @Override
+    public TwoNodesExchangeNeighbour construct(TSPInstance instance, Cycle currentSolution, int first, int second) {
+        return new TwoNodesExchangeNeighbour(instance, currentSolution, first, second);
+    }
+
+    @Override
+    public boolean isValid(int first, int second) {
+        return first != second;
+    }
+
+    @Override
+    public String toString() {
+        return "2-Nodes";
     }
 }

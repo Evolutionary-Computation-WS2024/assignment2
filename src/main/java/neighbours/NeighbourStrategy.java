@@ -9,22 +9,30 @@ public abstract class NeighbourStrategy {
     public Cycle ThisNeighbor;
     protected final Cycle currentSolution;
     protected final TSPInstance instance;
+
+    public NeighbourStrategy() {
+        this.currentSolution = null;
+        this.instance = null;
+    }
     
     public NeighbourStrategy(TSPInstance instance, Cycle currentSolution) {
         this.instance = instance;
         this.currentSolution = currentSolution;
     }
+
     /** 
     * returns utility delta for this neighbour and sets it as evaluationResult
     * negative delta -> neighbour is better than current solution
     * positive delta -> neighbour is worse than current solution
     */
     public abstract int evaluate();
+
     /**
      * Actually returns this neighbour as a cycle object and sets it as ThisNeighbor
      */
     public abstract Cycle buildNeighbour();
-    /** 
+
+    /**
     * returns utility delta for substituting the given node on the given place in a cycle
     */
     protected int getNodeInsertionDelta(int nodeID, int nodePositionIndexInRoute) {
@@ -56,4 +64,11 @@ public abstract class NeighbourStrategy {
         this.evaluationResult = delta;
         return delta;
     }
+
+    /**
+     * Checks whether this combination of parameters is valid
+     */
+    public abstract boolean isValid(int first, int second);
+
+    public abstract NeighbourStrategy construct(TSPInstance instance, Cycle currentSolution, int first, int second);
 }

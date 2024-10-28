@@ -34,7 +34,6 @@ public final class GreedyCycleWithRegret extends Strategy {
 
     @Override
     public String toString() {
-        String text = this.regret_weight+"Xregret_plus("+this.utility_weight+")Xbest_objective_function";
-        return text;
+        return this.regret_weight+"Xregret_plus("+ this.utility_weight+")Xbest_objective_function";
     }
 }
