@@ -36,7 +36,11 @@ public final class TSPInstance {
         this.name = name;
         populatePoints(points);
         populateDistances();
+
+        long start = System.nanoTime();
         populateNearestNeighbors(10);
+        long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+        System.out.println("Time: " + elapsedMs);
     }
 
     public int evaluate(Cycle cycle) {

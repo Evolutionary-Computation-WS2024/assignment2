@@ -64,6 +64,7 @@ public class CandidateLocalSearch extends Strategy {
                 }
             }
         }
+//        TODO: Get info about candidates within strategy
 
         // Add intra-route
         for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
