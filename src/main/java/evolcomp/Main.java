@@ -6,7 +6,7 @@ import evolcomp.io.SolutionRow;
 import evolcomp.misc.Evaluator;
 import evolcomp.strategy.*;
 import evolcomp.strategy.ls.LSType;
-import evolcomp.strategy.ls.LocalSearch;
+import evolcomp.strategy.ls.CandidateLocalSearch;
 import evolcomp.tsp.TSPInstance;
 import neighbours.NeighbourStrategy;
 import neighbours.TwoEdgesExchangeNeighbour;
@@ -52,7 +52,7 @@ public class Main {
             for (LSType type : types) {
                 for (Strategy initial : initialSolutionMethods) {
                     for (NeighbourStrategy neigh : intraRouteStrategies) {
-                        LocalSearch ls = new LocalSearch(initial, neigh, type);
+                        CandidateLocalSearch ls = new CandidateLocalSearch(initial, neigh, type);
                         Evaluator evaluator = new Evaluator(tspInstance, ls);
 
                         String methodName = ls.toString();
