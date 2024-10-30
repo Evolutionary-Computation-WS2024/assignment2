@@ -46,7 +46,7 @@ public class LocalSearch extends Strategy {
     public List<NeighbourStrategy> getNeighbourhood() {
         List<NeighbourStrategy> neighbours = new ArrayList<>();
 
-        Set<Integer> solutionNodes = new HashSet<>(bestSolution.nodes());
+        Set<Integer> solutionNodes = new HashSet<>(bestSolution.getNodes());
         Set<Integer> otherNodes = new HashSet<>();
         for (int i=0; i<tsp.getHowManyNodes(); i++) {
             otherNodes.add(i);

@@ -2,14 +2,20 @@ package evolcomp.tsp;
 
 import java.util.List;
 
-public record Cycle(List<Integer> nodes) {
+public class Cycle {
+    private final List<Integer> nodes;
+
+    public Cycle(List<Integer> nodes) {
+        this.nodes = nodes;
+    }
+
     @Override
     public String toString() {
         return String.join(",", nodes.stream().map(Object::toString).toList());
     }
     /**
      * Returns the ID of node in the cycle that is immediately before the given index.
-     * 
+     *
      * @param index the index of the node for which to find the previous node
      * @return the previous node ID
      * @throws IllegalArgumentException if the index is out of bounds
@@ -26,7 +32,7 @@ public record Cycle(List<Integer> nodes) {
     }
      /**
      * Returns the ID of node in the cycle that is immediately before the given index.
-     * 
+     *
      * @param index the index of the node for which to find the previous node
      * @return the previous node ID
      * @throws IllegalArgumentException if the index is out of bounds
@@ -43,6 +49,10 @@ public record Cycle(List<Integer> nodes) {
     }
     public int getIndexOfElement(int element) {
         return nodes.indexOf(element);
+    }
+
+    public List<Integer> getNodes() {
+        return nodes;
     }
 }
 

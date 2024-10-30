@@ -22,10 +22,10 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
     {
         super(instance, currentSolution);
         // ensure that the first node is actually before the second (required for case 1 in evaluate)
-        if (firstNodePositionIndexInRoute == 0 && secondNodePositionIndexInRoute == this.currentSolution.nodes().size()-1) {
+        if (firstNodePositionIndexInRoute == 0 && secondNodePositionIndexInRoute == this.currentSolution.getNodes().size()-1) {
             this.firstNodePositionIndexInRoute = secondNodePositionIndexInRoute;
             this.secondNodePositionIndexInRoute = firstNodePositionIndexInRoute;
-        } else if (firstNodePositionIndexInRoute == this.currentSolution.nodes().size()-1 && secondNodePositionIndexInRoute == 0) {
+        } else if (firstNodePositionIndexInRoute == this.currentSolution.getNodes().size()-1 && secondNodePositionIndexInRoute == 0) {
             this.firstNodePositionIndexInRoute = firstNodePositionIndexInRoute;
             this.secondNodePositionIndexInRoute = secondNodePositionIndexInRoute;
         } else if (firstNodePositionIndexInRoute > secondNodePositionIndexInRoute) {
@@ -39,7 +39,7 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
 
     @Override
     public int evaluate() {
-        List<Integer> nodesList = this.currentSolution.nodes();
+        List<Integer> nodesList = this.currentSolution.getNodes();
         int nextNodeID, prevNodeID, delta;
         int indexesDifference = Math.abs(firstNodePositionIndexInRoute - secondNodePositionIndexInRoute);
         
@@ -49,9 +49,9 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
         //case 1 swap two consecutive nodes
         // O--O--A--B--O
         if (indexesDifference == 1 ||  indexesDifference == nodesList.size()-1) {
-            nextNodeID = nodesList.get((secondNodePositionIndexInRoute + 1)% (this.currentSolution.nodes().size()));
+            nextNodeID = nodesList.get((secondNodePositionIndexInRoute + 1)% (this.currentSolution.getNodes().size()));
             if (firstNodePositionIndexInRoute == 0) {
-                prevNodeID = nodesList.get(this.currentSolution.nodes().size()-1);
+                prevNodeID = nodesList.get(this.currentSolution.getNodes().size()-1);
             } else {
                 prevNodeID = nodesList.get(firstNodePositionIndexInRoute-1);
             }
@@ -75,7 +75,7 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
 
     @Override
     public Cycle buildNeighbour() {
-        List<Integer> nodesListCopy = new ArrayList<>(this.currentSolution.nodes());
+        List<Integer> nodesListCopy = new ArrayList<>(this.currentSolution.getNodes());
         Collections.swap(nodesListCopy, this.firstNodePositionIndexInRoute, this.secondNodePositionIndexInRoute);
         return new Cycle(nodesListCopy);
     }

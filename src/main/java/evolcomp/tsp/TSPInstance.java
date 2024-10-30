@@ -40,7 +40,7 @@ public final class TSPInstance {
     }
 
     public int evaluate(Cycle cycle) {
-        int cycleSize = cycle.nodes().size();
+        int cycleSize = cycle.getNodes().size();
         if (cycleSize != requiredCycleLength) {
             throw new IllegalArgumentException("Provided cycle length (" + cycleSize + ") does not match instance's required cycle length (" + requiredCycleLength + ")!");
         }
@@ -48,7 +48,7 @@ public final class TSPInstance {
         int nodesCost = 0;
         int edgesCost = 0;
 
-        Iterator<Integer> i = cycle.nodes().iterator();
+        Iterator<Integer> i = cycle.getNodes().iterator();
         int prev = i.next();
 
         while (i.hasNext()) {
@@ -65,7 +65,7 @@ public final class TSPInstance {
         }
 
         // add cost of edge between first and last
-        edgesCost += getDistanceBetween(cycle.nodes().get(0), prev);
+        edgesCost += getDistanceBetween(cycle.getNodes().get(0), prev);
 
         // add cost of last node
         nodesCost += getCostAt(prev);
