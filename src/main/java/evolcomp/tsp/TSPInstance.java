@@ -7,6 +7,7 @@ import java.util.*;
 public final class TSPInstance {
     private final HashMap<Integer, Point> points;
     private final HashMap<Integer, HashMap<Integer, Integer>> distances;
+    private final HashMap<Integer, Set<Integer>> nearestNeighbors;
     private final int hashMapCapacity;
     private String name;
     private final int howManyNodes;
@@ -16,22 +17,26 @@ public final class TSPInstance {
         hashMapCapacity = Exponentiation.getClosest2ToThePowerOf(points.size());
         this.points = new HashMap<>(hashMapCapacity, 1.0f);
         this.distances = new HashMap<>(hashMapCapacity, 1.0f);
+        this.nearestNeighbors = new HashMap<>(hashMapCapacity, 1.0f);
         this.howManyNodes = points.size();
         this.requiredCycleLength = (points.size() + 1) / 2;
         this.name = null;
         populatePoints(points);
         populateDistances();
+        populateNearestNeighbors(10);
     }
 
     public TSPInstance(List<Point> points, String name) {
         hashMapCapacity = Exponentiation.getClosest2ToThePowerOf(points.size());
         this.points = new HashMap<>(hashMapCapacity, 1.0f);
         this.distances = new HashMap<>(hashMapCapacity, 1.0f);
+        this.nearestNeighbors = new HashMap<>(hashMapCapacity, 1.0f);
         this.howManyNodes = points.size();
         this.requiredCycleLength = (points.size() + 1) / 2;
         this.name = name;
         populatePoints(points);
         populateDistances();
+        populateNearestNeighbors(10);
     }
 
     public int evaluate(Cycle cycle) {
@@ -113,7 +118,37 @@ public final class TSPInstance {
             }
         }
     }
-
+    
+    private void populateNearestNeighbors(int neighborCount) {
+        for (int i = 0; i < howManyNodes; i++) {
+            // each element in pq is an int[] array, a[0] = neighbor’s index, a[1] = neighbor’s distance
+            // a -> a[1] lambda expression idicates that distance will be used for comaprison
+            PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+            // entrySet()returns a Set of Map.Entry objects
+            for (Map.Entry<Integer, Integer> entry : distances.get(i).entrySet()) {
+                int neighborIndex = entry.getKey();
+                int distance = entry.getValue();
+                int costAdjustedDistance = distance + getCostAt(neighborIndex);
+                pq.add(new int[]{neighborIndex, costAdjustedDistance});
+                if (pq.size() > neighborCount) {
+                    pq.poll(); // Remove the farthest neighbor if we exceed neighborCount
+                }
+            }
+            Set<Integer> nearestSet = new HashSet<>();
+            for (int[] neighbor : pq) {
+                nearestSet.add(neighbor[0]);
+            }
+            nearestNeighbors.put(i, nearestSet);
+        }
+    }
+    
+    public Set<Integer> getNearestNeighbors(int pointIndex) {
+    // Validate input
+    if (pointIndex < 0 || pointIndex >= howManyNodes) {
+        throw new IllegalArgumentException("Point index must be between 0 and " + (howManyNodes - 1) + " (pointIndex=" + pointIndex + " was provided)");
+    }
+    return nearestNeighbors.get(pointIndex);
+    }
     // Returns number of nodes for this TSP instance
     public int getHowManyNodes() {
         return howManyNodes;
