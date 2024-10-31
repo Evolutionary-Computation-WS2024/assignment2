@@ -53,31 +53,59 @@ public class CandidateLocalSearch extends Strategy {
         }
         otherNodes.removeAll(solutionNodes);
 
-        // Add inter-route
-        for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
-            Set<Integer> nodeCandidates = tsp.getNearestNeighbors(i);
-            Set<Integer> nodeFreeCandidates = new HashSet<>(nodeCandidates);
-            nodeFreeCandidates.removeAll(otherNodes);
-            if (!nodeFreeCandidates.isEmpty()) {
-                for (int candidateNode : nodeFreeCandidates) {
-                    neighbours.add(new InterRouteNeighbour(tsp, bestSolution, i, candidateNode));
+        // Add inter-route       
+        for (int outsiderID : otherNodes) {
+            Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(outsiderID);
+            Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
+            nearestInSolution.removeAll(otherNodes);
+            if (!nearestInSolution.isEmpty()) {
+                Set<Integer> uniqueCandidatesIndexes = new HashSet<>(); //declared as a set to avoid the samae insertions
+                for (int nearestNeighbor : nearestInSolution) {
+                    int candidateIndex = bestSolution.getIndexOfElement(nearestNeighbor);
+                    uniqueCandidatesIndexes.add(bestSolution.getPreviousNodeIndex(candidateIndex));
+                    uniqueCandidatesIndexes.add(bestSolution.getPreviousNodeIndex(candidateIndex));
+                }
+                for (int candidateIndex : uniqueCandidatesIndexes) {
+                    neighbours.add(new InterRouteNeighbour(
+                            tsp,
+                            bestSolution,
+                            candidateIndex,
+                            outsiderID));
                 }
             }
         }
-//        TODO: Get info about candidates within strategy
-
-        // Add intra-route
-        for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
-            for (int j=0; j<tsp.getRequiredCycleLength(); j++) {
-                if (i == j) {
-                    continue;
-                }
-                if (intraRouteStrategy.isValid(i, j)) {
-                    neighbours.add(intraRouteStrategy.construct(tsp, bestSolution, i, j));
-                }
+        
+        // Add iner route
+        Set<Pair> uniqueEdgesExchanges = new HashSet<>();
+        for (int routeNodeID : solutionNodes) {
+            
+            Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(routeNodeID);
+            Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
+            nearestInSolution.removeAll(otherNodes);
+            
+            if (!nearestInSolution.isEmpty()) {
+                for (int candidateNodeID : nearestInSolution) {
+                    int candidateNodeIndex = bestSolution.getIndexOfElement(candidateNodeID);
+                    int currentNodeIndex = bestSolution.getIndexOfElement(routeNodeID);
+                    uniqueEdgesExchanges.add(new Pair(
+                            candidateNodeIndex, 
+                            currentNodeIndex));
+                    uniqueEdgesExchanges.add(new Pair(
+                            bestSolution.getPreviousNodeIndex(candidateNodeIndex),
+                            bestSolution.getPreviousNodeIndex(currentNodeIndex)));
+                } 
+            }           
+        }
+        for (Pair pair : uniqueEdgesExchanges) {
+            if (intraRouteStrategy.isValid(pair.first , pair.second)) {
+                    neighbours.add(
+                            intraRouteStrategy.construct(
+                                    tsp,
+                                    bestSolution,
+                                    pair.first,
+                                    pair.second));
             }
         }
-
         return neighbours;
     }
 
