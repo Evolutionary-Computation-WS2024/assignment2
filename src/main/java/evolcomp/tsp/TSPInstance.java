@@ -146,12 +146,12 @@ public final class TSPInstance {
         }
     }
     
-    public Set<Integer> getNearestNeighbors(int pointIndex) {
+    public Set<Integer> getNearestNeighbors(int pointID) {
     // Validate input
-    if (pointIndex < 0 || pointIndex >= howManyNodes) {
-        throw new IllegalArgumentException("Point index must be between 0 and " + (howManyNodes - 1) + " (pointIndex=" + pointIndex + " was provided)");
+    if (pointID < 0 || pointID >= howManyNodes) {
+        throw new IllegalArgumentException("Point index must be between 0 and " + (howManyNodes - 1) + " (pointIndex=" + pointID + " was provided)");
     }
-    return nearestNeighbors.get(pointIndex);
+    return nearestNeighbors.get(pointID);
     }
     // Returns number of nodes for this TSP instance
     public int getHowManyNodes() {
