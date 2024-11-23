@@ -26,7 +26,7 @@ public final class Evaluator {
 
     private void execute() {
         int totalValue = 0;
-        for (int i=0; i<instance.getHowManyNodes(); i++) {
+        for (int i=0; i<20; i++) {
             long start = System.nanoTime();
             Cycle currentCycle = strategy.apply(instance, i);
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;

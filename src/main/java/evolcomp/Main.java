@@ -7,6 +7,7 @@ import evolcomp.misc.Evaluator;
 import evolcomp.strategy.*;
 import evolcomp.strategy.ls.LSType;
 import evolcomp.strategy.ls.LocalSearch;
+import evolcomp.strategy.ls.MSLS;
 import evolcomp.tsp.TSPInstance;
 import neighbours.NeighbourStrategy;
 import neighbours.TwoEdgesExchangeNeighbour;
@@ -21,22 +22,10 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException, URISyntaxException {
         List<TSPInstance> tspInstances = readTSPInstances();
-
-        // Create combinations of Intra-Route strategies
-        List<NeighbourStrategy> intraRouteStrategies = new ArrayList<>();
-        intraRouteStrategies.add(new TwoEdgesExchangeNeighbour());
-        intraRouteStrategies.add(new TwoNodesExchangeNeighbour());
-
-        // Create combinations of Greedy-Steepest
-        List<LSType> types = List.of(
-                LSType.GREEDY,
-                LSType.STEEPEST
-        );
-
+        
         // Create combinations of initial solution method
-        List<Strategy> initialSolutionMethods = List.of(
-                new RandomStrategy(42),
-                new GreedyCycleWithRegret(-1, -1)
+        List<Strategy> localSearchStrategies = List.of(
+                new MSLS()
         );
 
 
@@ -49,10 +38,7 @@ public class Main {
         List<SolutionRow> solutions = new ArrayList<>();
 
         for (TSPInstance tspInstance : tspInstances) {
-            for (LSType type : types) {
-                for (Strategy initial : initialSolutionMethods) {
-                    for (NeighbourStrategy neigh : intraRouteStrategies) {
-                        LocalSearch ls = new LocalSearch(initial, neigh, type);
+            for (Strategy ls : localSearchStrategies) {
                         Evaluator evaluator = new Evaluator(tspInstance, ls);
 
                         String methodName = ls.toString();
@@ -71,8 +57,6 @@ public class Main {
 
                         SolutionRow row = new SolutionRow(methodName, instanceName, bestSolution);
                         solutions.add(row);
-                    }
-                }
             }
         }
 
