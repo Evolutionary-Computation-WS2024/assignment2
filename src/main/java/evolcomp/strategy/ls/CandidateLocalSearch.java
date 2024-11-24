@@ -3,8 +3,8 @@ package evolcomp.strategy.ls;
 import evolcomp.strategy.Strategy;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
-import neighbours.InterRouteNeighbour;
-import neighbours.NeighbourStrategy;
+import evolcomp.neighbours.InterRouteNeighbour;
+import evolcomp.neighbours.NeighbourStrategy;
 
 import java.util.*;
 
@@ -75,7 +75,7 @@ public class CandidateLocalSearch extends Strategy {
             }
         }
         
-        // Add iner route
+        // Add intra-route
         Set<Pair> uniqueEdgesExchanges = new HashSet<>();
         for (int routeNodeID : solutionNodes) {
             

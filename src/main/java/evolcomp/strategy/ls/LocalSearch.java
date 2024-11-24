@@ -3,8 +3,8 @@ package evolcomp.strategy.ls;
 import evolcomp.strategy.Strategy;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
-import neighbours.InterRouteNeighbour;
-import neighbours.NeighbourStrategy;
+import evolcomp.neighbours.InterRouteNeighbour;
+import evolcomp.neighbours.NeighbourStrategy;
 
 import java.util.*;
 
@@ -17,7 +17,6 @@ public class LocalSearch extends Strategy {
 
     private TSPInstance tsp;
     private Cycle bestSolution;
-
 
     public LocalSearch(Strategy initialStrategy, NeighbourStrategy intraRouteStrategy, LSType lsType) {
         this.initialStrategy = initialStrategy;

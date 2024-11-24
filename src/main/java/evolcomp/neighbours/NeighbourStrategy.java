@@ -1,4 +1,4 @@
-package neighbours;
+package evolcomp.neighbours;
 
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;

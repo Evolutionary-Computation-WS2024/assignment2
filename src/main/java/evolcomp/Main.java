@@ -8,9 +8,9 @@ import evolcomp.strategy.*;
 import evolcomp.strategy.ls.LSType;
 import evolcomp.strategy.ls.CandidateLocalSearch;
 import evolcomp.tsp.TSPInstance;
-import neighbours.NeighbourStrategy;
-import neighbours.TwoEdgesExchangeNeighbour;
-import neighbours.TwoNodesExchangeNeighbour;
+import evolcomp.neighbours.NeighbourStrategy;
+import evolcomp.neighbours.TwoEdgesExchangeNeighbour;
+import evolcomp.neighbours.TwoNodesExchangeNeighbour;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
