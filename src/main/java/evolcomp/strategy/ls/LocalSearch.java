@@ -19,13 +19,17 @@ public class LocalSearch extends Strategy {
 
     private TSPInstance tsp;
     private Cycle bestSolution;
-    private final Cycle intitialSolution;
+    private Cycle intitialSolution;
 
 
     public LocalSearch(Cycle intitialSolution) {
         this.intraRouteStrategy = new TwoEdgesExchangeNeighbour();
         this.lsType = STEEPEST;
         this.intitialSolution = intitialSolution;
+    }
+    
+    public void setIntitialSolution(Cycle solution) {
+        this.intitialSolution = solution;
     }
 
     @Override

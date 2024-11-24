@@ -8,6 +8,7 @@ import evolcomp.strategy.*;
 import evolcomp.strategy.ls.LSType;
 import evolcomp.strategy.ls.LocalSearch;
 import evolcomp.strategy.ls.MSLS;
+import evolcomp.strategy.ls.ILS;
 import evolcomp.tsp.TSPInstance;
 import neighbours.NeighbourStrategy;
 import neighbours.TwoEdgesExchangeNeighbour;
@@ -25,16 +26,17 @@ public class Main {
         
         // Create combinations of initial solution method
         List<Strategy> localSearchStrategies = List.of(
-                new MSLS()
+                new MSLS(),
+                new ILS()
         );
 
 
-        String delim = "|----------|-------------------------------------------|--------------------------------|--------------------------------|";
+        String delim = "|----------|-------------------------------------------|--------------------------------|--------------------------------|---------------------------|";
         System.out.println(delim);
-        System.out.println("| Instance | Strategy                                  | f(x) [avg (min - max)]         | time in ms [avg (min - max)]   |");
+        System.out.println("| Instance | Strategy                                  | f(x) [avg (min - max)]         | time in ms [avg (min - max)]   | average local search runs |");
         System.out.println(delim);
 
-        String fmt = "| %-8s | %-41s | %-8d (%-8d - %-8d) | %-8d (%-8d - %-8d) |%n";
+        String fmt = "| %-8s | %-41s | %-8d (%-8d - %-8d) | %-8d (%-8d - %-8d) | %-8d |%n";
         List<SolutionRow> solutions = new ArrayList<>();
 
         for (TSPInstance tspInstance : tspInstances) {
@@ -52,8 +54,9 @@ public class Main {
                         long minTime = evaluator.getMinTimeMs();
                         long avgTime = evaluator.getAverageTimeMs();
                         long maxTime = evaluator.getMaxTimeMs();
+                        int averageLsRuns = evaluator.getAverageLsRuns();
 
-                        System.out.printf(fmt, instanceName, methodName, avgValue, minValue, maxValue, avgTime, minTime, maxTime);
+                        System.out.printf(fmt, instanceName, methodName, avgValue, minValue, maxValue, avgTime, minTime, maxTime, averageLsRuns);
 
                         SolutionRow row = new SolutionRow(methodName, instanceName, bestSolution);
                         solutions.add(row);

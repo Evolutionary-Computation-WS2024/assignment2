@@ -1,6 +1,7 @@
 package evolcomp.misc;
 
 import evolcomp.strategy.Strategy;
+import evolcomp.strategy.ls.ILS;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
 
@@ -17,6 +18,7 @@ public final class Evaluator {
     private long minTimeMs = Long.MAX_VALUE;
     private long maxTimeMs = Long.MIN_VALUE;
     private long averageTimeMs;
+    private int averageLsRuns;
 
     public Evaluator(TSPInstance instance, Strategy strategy) {
         this.instance = instance;
@@ -26,12 +28,13 @@ public final class Evaluator {
 
     private void execute() {
         int totalValue = 0;
+        this.averageLsRuns = 0;
         for (int i=0; i<20; i++) {
             long start = System.nanoTime();
             Cycle currentCycle = strategy.apply(instance, i);
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;
             averageTimeMs += elapsedMs;
-
+            averageLsRuns += strategy.getNoLsRuns();
             if (elapsedMs > maxTimeMs) {
                 maxTimeMs = elapsedMs;
             }
@@ -50,8 +53,9 @@ public final class Evaluator {
             }
             totalValue += currentValue;
         }
-        averageValue = totalValue / instance.getHowManyNodes();
-        averageTimeMs = averageTimeMs / instance.getHowManyNodes();
+        averageValue = totalValue / 20;
+        averageTimeMs = averageTimeMs / 20;
+        averageLsRuns = averageLsRuns / 20;
     }
 
     public int getAverageValue() {
@@ -80,5 +84,9 @@ public final class Evaluator {
 
     public long getAverageTimeMs() {
         return averageTimeMs;
+    }
+    
+    public int getAverageLsRuns() {
+        return averageLsRuns;
     }
 }
