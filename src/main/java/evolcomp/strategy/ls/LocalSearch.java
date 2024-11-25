@@ -149,9 +149,18 @@ public class LocalSearch extends Strategy {
         return nearestInSolution;
     }
 
+    // Randomization is inspired on Fisher-Yates approach
     private boolean useGreedy() {
-        Collections.shuffle(neighbours, rand);
-        for (NeighbourStrategy neighbour : neighbours) {
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < neighbours.size(); i++) {
+            indices.add(i);
+        }
+
+        for (int i = 0; i < indices.size(); i++) {
+            int randomIndex = i + rand.nextInt(indices.size() - i);
+            Collections.swap(indices, i, randomIndex);
+            NeighbourStrategy neighbour = neighbours.get(indices.get(i));
+
             int delta = neighbour.evaluate();
             if (delta < 0) {
                 bestSolution = neighbour.buildNeighbour();
