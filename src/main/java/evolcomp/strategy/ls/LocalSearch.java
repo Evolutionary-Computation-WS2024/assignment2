@@ -74,12 +74,28 @@ public class LocalSearch extends Strategy {
         }
     }
 
+    private void getNeighbourhoodWithoutCandidateMoves(Set<Integer> otherNodes) {
+        // Add inter-route
+        for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
+            for (int otherNode : otherNodes) {
+                neighbours.add(new InterRouteNeighbour(tsp, bestSolution, i, otherNode));
+            }
+        }
+
+        // Add intra-route
+        for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
+            for (int j=0; j<tsp.getRequiredCycleLength(); j++) {
+                if (i != j && intraRouteStrategy.isValid(i, j)) {
+                    neighbours.add(intraRouteStrategy.construct(tsp, bestSolution, i, j));
+                }
+            }
+        }
+    }
+
     private void getNeighbourhoodUsingCandidateMoves(Set<Integer> solutionNodes, Set<Integer> otherNodes) {
         // Add inter-route
         for (int outsiderID : otherNodes) {
-            Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(outsiderID);
-            Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
-            nearestInSolution.removeAll(otherNodes);
+            Set<Integer> nearestInSolution = getNearestInSolution(outsiderID, otherNodes);
             if (!nearestInSolution.isEmpty()) {
                 Set<Integer> uniqueCandidatesIndexes = new HashSet<>(); //declared as a set to avoid the samae insertions
                 for (int nearestNeighbor : nearestInSolution) {
@@ -99,15 +115,12 @@ public class LocalSearch extends Strategy {
         // Add intra-route
         Set<Pair> uniqueEdgesExchanges = new HashSet<>();
         for (int routeNodeID : solutionNodes) {
-
-            Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(routeNodeID);
-            Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
-            nearestInSolution.removeAll(otherNodes);
+            Set<Integer> nearestInSolution = getNearestInSolution(routeNodeID, otherNodes);
 
             if (!nearestInSolution.isEmpty()) {
+                int currentNodeIndex = bestSolution.getIndexOfElement(routeNodeID);
                 for (int candidateNodeID : nearestInSolution) {
                     int candidateNodeIndex = bestSolution.getIndexOfElement(candidateNodeID);
-                    int currentNodeIndex = bestSolution.getIndexOfElement(routeNodeID);
                     uniqueEdgesExchanges.add(new Pair(
                             candidateNodeIndex,
                             currentNodeIndex));
@@ -129,25 +142,11 @@ public class LocalSearch extends Strategy {
         }
     }
 
-    private void getNeighbourhoodWithoutCandidateMoves(Set<Integer> otherNodes) {
-        // Add inter-route
-        for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
-            for (int otherNode : otherNodes) {
-                neighbours.add(new InterRouteNeighbour(tsp, bestSolution, i, otherNode));
-            }
-        }
-
-        // Add intra-route
-        for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
-            for (int j=0; j<tsp.getRequiredCycleLength(); j++) {
-                if (i == j) {
-                    continue;
-                }
-                if (intraRouteStrategy.isValid(i, j)) {
-                    neighbours.add(intraRouteStrategy.construct(tsp, bestSolution, i, j));
-                }
-            }
-        }
+    private Set<Integer> getNearestInSolution(int nodeID, Set<Integer> otherNodes) {
+        Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(nodeID);
+        Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
+        nearestInSolution.removeAll(otherNodes);
+        return nearestInSolution;
     }
 
     private boolean useGreedy() {
