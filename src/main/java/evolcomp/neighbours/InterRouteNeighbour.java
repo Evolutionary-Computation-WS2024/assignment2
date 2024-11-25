@@ -39,9 +39,4 @@ public class InterRouteNeighbour extends NeighbourStrategy {
     public InterRouteNeighbour construct(TSPInstance instance, Cycle currentSolution, int nodePositionIndexInRoute, int newNodeId) {
         return new InterRouteNeighbour(instance, currentSolution, nodePositionIndexInRoute, newNodeId);
     }
-
-    @Override
-    public boolean isValid(int first, int second) {
-        return first != second;
-    }
 }

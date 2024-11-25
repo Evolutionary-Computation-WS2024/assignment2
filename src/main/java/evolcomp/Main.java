@@ -4,13 +4,13 @@ import evolcomp.io.CostTspReader;
 import evolcomp.io.SolutionExporter;
 import evolcomp.io.SolutionRow;
 import evolcomp.misc.Evaluator;
+import evolcomp.neighbours.IntraRouteNeighbour;
 import evolcomp.strategy.*;
 import evolcomp.strategy.ls.LSType;
-import evolcomp.strategy.ls.CandidateLocalSearch;
+import evolcomp.strategy.ls.LocalSearch;
 import evolcomp.tsp.TSPInstance;
 import evolcomp.neighbours.NeighbourStrategy;
 import evolcomp.neighbours.TwoEdgesExchangeNeighbour;
-import evolcomp.neighbours.TwoNodesExchangeNeighbour;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,23 +22,8 @@ public class Main {
     public static void main(String[] args) throws IOException, URISyntaxException {
         List<TSPInstance> tspInstances = readTSPInstances();
 
-        // Create combinations of Intra-Route strategies
-        List<NeighbourStrategy> intraRouteStrategies = new ArrayList<>();
-        intraRouteStrategies.add(new TwoEdgesExchangeNeighbour());
-        intraRouteStrategies.add(new TwoNodesExchangeNeighbour());
-
-        // Create combinations of Greedy-Steepest
-        List<LSType> types = List.of(
-                LSType.GREEDY,
-                LSType.STEEPEST
-        );
-
-        // Create combinations of initial solution method
-        List<Strategy> initialSolutionMethods = List.of(
-                new RandomStrategy(42),
-                new GreedyCycleWithRegret(-1, -1)
-        );
-
+        Strategy initialStrategy = new RandomStrategy(42);
+        IntraRouteNeighbour neighStrategy = new TwoEdgesExchangeNeighbour();
 
         String delim = "|----------|-------------------------------------------|--------------------------------|--------------------------------|";
         System.out.println(delim);
@@ -49,31 +34,38 @@ public class Main {
         List<SolutionRow> solutions = new ArrayList<>();
 
         for (TSPInstance tspInstance : tspInstances) {
-            for (LSType type : types) {
-               for (Strategy initial : initialSolutionMethods) {
-                    for (NeighbourStrategy neigh : intraRouteStrategies) {
-                        CandidateLocalSearch ls = new CandidateLocalSearch(initial, neigh, type);
-                        Evaluator evaluator = new Evaluator(tspInstance, ls);
+//            Strategy ls = new LocalSearch.Builder()
+//                    .initialStrategy(initialStrategy)
+//                    .intraRouteStrategy(neighStrategy)
+//                    .lsType(LSType.STEEPEST)
+//                    .usePreviousDeltas(true)
+//                    .build();
 
-                        String methodName = ls.toString();
-                        String instanceName = tspInstance.toString();
-                        String bestSolution = evaluator.getBestCycle().toString();
+            Strategy ls = new LocalSearch.Builder()
+                    .initialStrategy(initialStrategy)
+                    .intraRouteStrategy(neighStrategy)
+                    .lsType(LSType.GREEDY)
+                    .useCandidateMoves(true)
+                    .build();
 
-                        int minValue = evaluator.getMinValue();
-                        int maxValue = evaluator.getMaxValue();
-                        int avgValue = evaluator.getAverageValue();
+            Evaluator evaluator = new Evaluator(tspInstance, ls);
 
-                        long minTime = evaluator.getMinTimeMs();
-                        long avgTime = evaluator.getAverageTimeMs();
-                        long maxTime = evaluator.getMaxTimeMs();
+            String methodName = ls.toString();
+            String instanceName = tspInstance.toString();
+            String bestSolution = evaluator.getBestCycle().toString();
 
-                        System.out.printf(fmt, instanceName, methodName, avgValue, minValue, maxValue, avgTime, minTime, maxTime);
+            int minValue = evaluator.getMinValue();
+            int maxValue = evaluator.getMaxValue();
+            int avgValue = evaluator.getAverageValue();
 
-                        SolutionRow row = new SolutionRow(methodName, instanceName, bestSolution);
-                        solutions.add(row);
-                    }
-                }
-            }
+            long minTime = evaluator.getMinTimeMs();
+            long avgTime = evaluator.getAverageTimeMs();
+            long maxTime = evaluator.getMaxTimeMs();
+
+            System.out.printf(fmt, instanceName, methodName, avgValue, minValue, maxValue, avgTime, minTime, maxTime);
+
+            SolutionRow row = new SolutionRow(methodName, instanceName, bestSolution);
+            solutions.add(row);
         }
 
         System.out.println(delim);

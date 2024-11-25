@@ -20,7 +20,10 @@ import java.util.List;
  * 
  * @author Jerzu, Siemieniuk
  */
-public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
+public final class TwoEdgesExchangeNeighbour
+    extends NeighbourStrategy
+        implements IntraRouteNeighbour {
+
     private final int A1Index;
     private final int A2Index;
     private final int B1Index;
@@ -54,28 +57,28 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
         if (!isValid(firstEdgeStartingNodePositionIndexInRoute, secondEdgeStartingNodePositionIndexInRoute)) {
             throw new IllegalArgumentException("Minimal distance between two entries must be 2!");
         }
-        
+
         this.A1Index = firstEdgeStartingNodePositionIndexInRoute;
         this.A2Index = secondEdgeStartingNodePositionIndexInRoute;
         this.B1Index = (A1Index + 1)%currentSolution.getNodes().size();
         this.B2Index = (A2Index + 1)%currentSolution.getNodes().size();
-        
+
         this.A1 = currentSolution.getNodes().get(A1Index);
         this.A2 = currentSolution.getNodes().get(A2Index);
         this.B1 = currentSolution.getNodes().get(B1Index);
         this.B2 = currentSolution.getNodes().get(B2Index);
     }
-    
+
     @Override
     public int evaluate() {
         int costs = 0;
         int gains = 0;
         costs += instance.getDistanceBetween(A1, A2);
         costs += instance.getDistanceBetween(B1, B2);
-                
+
         gains += instance.getDistanceBetween(A1, B1);
         gains += instance.getDistanceBetween(A2, B2);
-        
+
         int delta = costs - gains;
         this.evaluationResult = delta;
         return delta;
@@ -83,10 +86,8 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
 
     @Override
     public Cycle buildNeighbour() {
-        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.getNodes(),B1Index, A2Index);
-        Cycle neighbour = new Cycle(neighbourAsList);
-        this.ThisNeighbor = neighbour;
-        return neighbour;
+        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.getNodes(), B1Index, A2Index);
+        return new Cycle(neighbourAsList);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
 
     /**
      * 
-     * @param originalList
+     * @param originalList - Original list
      * @param start - the last node of edge 1 (B1)
      * @param end  - the First node of edge 2 (A2)
      */
@@ -122,5 +123,11 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
     @Override
     public String toString() {
         return "2-Edges";
+    }
+
+    // TODO: Implement
+    @Override
+    public boolean allEdgesExist(Cycle bestSolution) {
+        return false;
     }
 }

@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
+public final class TwoNodesExchangeNeighbour
+    extends NeighbourStrategy
+        implements IntraRouteNeighbour {
+
     private int firstNodePositionIndexInRoute;
     private int secondNodePositionIndexInRoute;
 
@@ -93,5 +96,11 @@ public class TwoNodesExchangeNeighbour extends NeighbourStrategy {
     @Override
     public String toString() {
         return "2-Nodes";
+    }
+
+    // TODO: Implement
+    @Override
+    public boolean allEdgesExist(Cycle bestSolution) {
+        return false;
     }
 }

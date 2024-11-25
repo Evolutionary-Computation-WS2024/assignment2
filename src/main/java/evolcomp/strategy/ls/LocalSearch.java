@@ -1,5 +1,7 @@
 package evolcomp.strategy.ls;
 
+import evolcomp.misc.SortedList;
+import evolcomp.neighbours.IntraRouteNeighbour;
 import evolcomp.strategy.Strategy;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
@@ -10,32 +12,36 @@ import java.util.*;
 
 public class LocalSearch extends Strategy {
     private Strategy initialStrategy;
-    private NeighbourStrategy intraRouteStrategy;
+    private IntraRouteNeighbour intraRouteStrategy;
     private LSType lsType;
     private boolean useCandidateMoves;
-    private boolean useCache;
+    private boolean usePreviousDeltas;
 
     private final Random rand = new Random(42);
 
     private TSPInstance tsp;
     private Cycle bestSolution;
     private List<NeighbourStrategy> neighbours;
+    private NeighbourStrategy lastAppliedNeighbour;
 
-    public LocalSearch(Strategy initialStrategy, NeighbourStrategy intraRouteStrategy, LSType lsType) {
+    // TODO: Refactor
+    private List<NeighbourStrategy> lm;
+
+    public LocalSearch(Strategy initialStrategy, IntraRouteNeighbour intraRouteStrategy, LSType lsType) {
         this.initialStrategy = initialStrategy;
         this.intraRouteStrategy = intraRouteStrategy;
         this.lsType = lsType;
         this.useCandidateMoves = false;
-        this.useCache = false;
+        this.usePreviousDeltas = false;
         this.neighbours = new ArrayList<>();
     }
 
-    public LocalSearch(Strategy initialStrategy, NeighbourStrategy intraRouteStrategy, LSType lsType, boolean useCandidateMoves, boolean useCache) {
+    public LocalSearch(Strategy initialStrategy, IntraRouteNeighbour intraRouteStrategy, LSType lsType, boolean useCandidateMoves, boolean usePreviousDeltas) {
         this.initialStrategy = initialStrategy;
         this.intraRouteStrategy = intraRouteStrategy;
         this.lsType = lsType;
         this.useCandidateMoves = useCandidateMoves;
-        this.useCache = useCache;
+        this.usePreviousDeltas = usePreviousDeltas;
         this.neighbours = new ArrayList<>();
     }
 
@@ -45,6 +51,12 @@ public class LocalSearch extends Strategy {
         this.neighbours = new ArrayList<>();
         bestSolution = initialStrategy.apply(tspInstance, startNode);
 
+        // TODO: Needs refactoring
+        if (lsType.equals(LSType.STEEPEST) && usePreviousDeltas && !useCandidateMoves) {
+            return useSteepestWithPreviousDeltas();
+        }
+        // ENDTODO
+
         boolean hasImproved = true;
         while (hasImproved) {
             getNeighbourhood();
@@ -52,6 +64,60 @@ public class LocalSearch extends Strategy {
                 case STEEPEST -> useSteepest();
                 case GREEDY -> useGreedy();
             };
+        }
+
+        return bestSolution;
+    }
+
+    private Cycle useSteepestWithPreviousDeltas() {
+        boolean hasImproved = true;
+        lm = new SortedList<>(Comparator.comparingInt(NeighbourStrategy::evaluate));
+
+        while (hasImproved) {
+            hasImproved = false;
+
+            Set<Integer> solutionNodes = new HashSet<>(bestSolution.getNodes());
+            Set<Integer> otherNodes = new HashSet<>();
+            for (int i=0; i<tsp.getHowManyNodes(); i++) {
+                otherNodes.add(i);
+            }
+            otherNodes.removeAll(solutionNodes);
+
+            // Add inter-route
+            for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
+                for (int otherNode : otherNodes) {
+                    NeighbourStrategy neighbour = new InterRouteNeighbour(tsp, bestSolution, i, otherNode);
+                    int delta = neighbour.evaluate();
+                    if (delta < 0) {
+                        lm.add(neighbour);
+                    }
+                }
+            }
+
+            // Add intra-route
+            for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
+                for (int j=0; j<tsp.getRequiredCycleLength(); j++) {
+                    if (i != j && intraRouteStrategy.isValid(i, j)) {
+                        NeighbourStrategy neighbour = intraRouteStrategy.construct(tsp, bestSolution, i, j);
+                        int delta = neighbour.evaluate();
+                        if (delta < 0) {
+                            lm.add(neighbour);
+                        }
+                    }
+                }
+            }
+
+            Iterator<NeighbourStrategy> it = lm.iterator();
+            while (it.hasNext()) {
+                lastAppliedNeighbour = it.next();
+                if (lastAppliedNeighbour instanceof InterRouteNeighbour inter) {
+
+                } else if (lastAppliedNeighbour instanceof IntraRouteNeighbour intra) {
+                    if (!intra.allEdgesExist(bestSolution)) {
+                        it.remove();
+                    }
+                }
+            }
         }
 
         return bestSolution;
@@ -159,11 +225,11 @@ public class LocalSearch extends Strategy {
         for (int i = 0; i < indices.size(); i++) {
             int randomIndex = i + rand.nextInt(indices.size() - i);
             Collections.swap(indices, i, randomIndex);
-            NeighbourStrategy neighbour = neighbours.get(indices.get(i));
+            lastAppliedNeighbour = neighbours.get(indices.get(i));
 
-            int delta = neighbour.evaluate();
+            int delta = lastAppliedNeighbour.evaluate();
             if (delta < 0) {
-                bestSolution = neighbour.buildNeighbour();
+                bestSolution = lastAppliedNeighbour.buildNeighbour();
                 return true;
             }
         }
@@ -186,6 +252,7 @@ public class LocalSearch extends Strategy {
             return false;
         }
         bestSolution = bestNeighbour.buildNeighbour();
+        lastAppliedNeighbour = bestNeighbour;
         return true;
     }
 
@@ -202,10 +269,10 @@ public class LocalSearch extends Strategy {
 
     public static final class Builder {
         private Strategy initialStrategy;
-        private NeighbourStrategy intraRouteStrategy;
+        private IntraRouteNeighbour intraRouteStrategy;
         private LSType lsType;
         private boolean useCandidateMoves = false;
-        private boolean useCache = false;
+        private boolean usePreviousDeltas = false;
 
         public Builder() {}
 
@@ -214,7 +281,7 @@ public class LocalSearch extends Strategy {
             return this;
         }
 
-        public Builder intraRouteStrategy(NeighbourStrategy intraRouteStrategy) {
+        public Builder intraRouteStrategy(IntraRouteNeighbour intraRouteStrategy) {
             this.intraRouteStrategy = intraRouteStrategy;
             return this;
         }
@@ -229,13 +296,13 @@ public class LocalSearch extends Strategy {
             return this;
         }
 
-        public Builder useCache(boolean useCache) {
-            this.useCache = useCache;
+        public Builder usePreviousDeltas(boolean usePreviousDeltas) {
+            this.usePreviousDeltas = usePreviousDeltas;
             return this;
         }
 
         public LocalSearch build() {
-            return new LocalSearch(initialStrategy, intraRouteStrategy, lsType, useCandidateMoves, useCache);
+            return new LocalSearch(initialStrategy, intraRouteStrategy, lsType, useCandidateMoves, usePreviousDeltas);
         }
     }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 
 public abstract class NeighbourStrategy {
     public int evaluationResult;
-    public Cycle ThisNeighbor;
     protected final Cycle currentSolution;
     protected final TSPInstance instance;
 
@@ -14,7 +13,7 @@ public abstract class NeighbourStrategy {
         this.currentSolution = null;
         this.instance = null;
     }
-    
+
     public NeighbourStrategy(TSPInstance instance, Cycle currentSolution) {
         this.instance = instance;
         this.currentSolution = currentSolution;
@@ -35,8 +34,8 @@ public abstract class NeighbourStrategy {
     /**
     * returns utility delta for substituting the given node on the given place in a cycle
     */
-    protected int getNodeInsertionDelta(int nodeID, int nodePositionIndexInRoute) {
-        List<Integer> nodesList = this.currentSolution.getNodes();
+    protected final int getNodeInsertionDelta(int nodeID, int nodePositionIndexInRoute) {
+        List<Integer> nodesList = currentSolution.getNodes();
         int lastNodeIndex = nodesList.size() - 1;
         int prevNodeID, nextNodeID;
         
@@ -66,9 +65,12 @@ public abstract class NeighbourStrategy {
     }
 
     /**
-     * Checks whether this combination of parameters is valid
+     * Checks whether this can be successfully applied to the current solution
      */
-    public abstract boolean isValid(int first, int second);
+    // TODO: Implement
+    public boolean canBeAppliedTo(Cycle cycle) {
+        return true;
+    }
 
     public abstract NeighbourStrategy construct(TSPInstance instance, Cycle currentSolution, int first, int second);
 }
