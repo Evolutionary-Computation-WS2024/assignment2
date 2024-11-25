@@ -12,38 +12,53 @@ public class LocalSearch extends Strategy {
     private Strategy initialStrategy;
     private NeighbourStrategy intraRouteStrategy;
     private LSType lsType;
+    private boolean useCandidateMoves;
+    private boolean useCache;
 
     private final Random rand = new Random(42);
 
     private TSPInstance tsp;
     private Cycle bestSolution;
+    private List<NeighbourStrategy> neighbours;
 
     public LocalSearch(Strategy initialStrategy, NeighbourStrategy intraRouteStrategy, LSType lsType) {
         this.initialStrategy = initialStrategy;
         this.intraRouteStrategy = intraRouteStrategy;
         this.lsType = lsType;
+        this.useCandidateMoves = false;
+        this.useCache = false;
+        this.neighbours = new ArrayList<>();
+    }
+
+    public LocalSearch(Strategy initialStrategy, NeighbourStrategy intraRouteStrategy, LSType lsType, boolean useCandidateMoves, boolean useCache) {
+        this.initialStrategy = initialStrategy;
+        this.intraRouteStrategy = intraRouteStrategy;
+        this.lsType = lsType;
+        this.useCandidateMoves = useCandidateMoves;
+        this.useCache = useCache;
+        this.neighbours = new ArrayList<>();
     }
 
     @Override
     public Cycle apply(TSPInstance tspInstance, int startNode) {
         this.tsp = tspInstance;
+        this.neighbours = new ArrayList<>();
         bestSolution = initialStrategy.apply(tspInstance, startNode);
+
         boolean hasImproved = true;
-
         while (hasImproved) {
-            List<NeighbourStrategy> neighbors = getNeighbourhood();
-
+            getNeighbourhood();
             hasImproved = switch (lsType) {
-                case STEEPEST -> useSteepest(neighbors);
-                case GREEDY -> useGreedy(neighbors);
+                case STEEPEST -> useSteepest();
+                case GREEDY -> useGreedy();
             };
         }
 
         return bestSolution;
     }
 
-    public List<NeighbourStrategy> getNeighbourhood() {
-        List<NeighbourStrategy> neighbours = new ArrayList<>();
+    private void getNeighbourhood() {
+        neighbours = new ArrayList<>();
 
         Set<Integer> solutionNodes = new HashSet<>(bestSolution.getNodes());
         Set<Integer> otherNodes = new HashSet<>();
@@ -52,6 +67,69 @@ public class LocalSearch extends Strategy {
         }
         otherNodes.removeAll(solutionNodes);
 
+        if (useCandidateMoves) {
+            getNeighbourhoodUsingCandidateMoves(solutionNodes, otherNodes);
+        } else {
+            getNeighbourhoodWithoutCandidateMoves(otherNodes);
+        }
+    }
+
+    private void getNeighbourhoodUsingCandidateMoves(Set<Integer> solutionNodes, Set<Integer> otherNodes) {
+        // Add inter-route
+        for (int outsiderID : otherNodes) {
+            Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(outsiderID);
+            Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
+            nearestInSolution.removeAll(otherNodes);
+            if (!nearestInSolution.isEmpty()) {
+                Set<Integer> uniqueCandidatesIndexes = new HashSet<>(); //declared as a set to avoid the samae insertions
+                for (int nearestNeighbor : nearestInSolution) {
+                    int candidateIndex = bestSolution.getIndexOfElement(nearestNeighbor);
+                    uniqueCandidatesIndexes.add(bestSolution.getPreviousNodeIndex(candidateIndex));
+                }
+                for (int candidateIndex : uniqueCandidatesIndexes) {
+                    neighbours.add(new InterRouteNeighbour(
+                            tsp,
+                            bestSolution,
+                            candidateIndex,
+                            outsiderID));
+                }
+            }
+        }
+
+        // Add intra-route
+        Set<Pair> uniqueEdgesExchanges = new HashSet<>();
+        for (int routeNodeID : solutionNodes) {
+
+            Set<Integer> nearestNeighbors = tsp.getNearestNeighbors(routeNodeID);
+            Set<Integer> nearestInSolution = new HashSet<>(nearestNeighbors);
+            nearestInSolution.removeAll(otherNodes);
+
+            if (!nearestInSolution.isEmpty()) {
+                for (int candidateNodeID : nearestInSolution) {
+                    int candidateNodeIndex = bestSolution.getIndexOfElement(candidateNodeID);
+                    int currentNodeIndex = bestSolution.getIndexOfElement(routeNodeID);
+                    uniqueEdgesExchanges.add(new Pair(
+                            candidateNodeIndex,
+                            currentNodeIndex));
+                    uniqueEdgesExchanges.add(new Pair(
+                            bestSolution.getPreviousNodeIndex(candidateNodeIndex),
+                            bestSolution.getPreviousNodeIndex(currentNodeIndex)));
+                }
+            }
+        }
+        for (Pair pair : uniqueEdgesExchanges) {
+            if (intraRouteStrategy.isValid(pair.first , pair.second)) {
+                neighbours.add(
+                        intraRouteStrategy.construct(
+                                tsp,
+                                bestSolution,
+                                pair.first,
+                                pair.second));
+            }
+        }
+    }
+
+    private void getNeighbourhoodWithoutCandidateMoves(Set<Integer> otherNodes) {
         // Add inter-route
         for (int i=0; i<tsp.getRequiredCycleLength(); i++) {
             for (int otherNode : otherNodes) {
@@ -70,11 +148,9 @@ public class LocalSearch extends Strategy {
                 }
             }
         }
-
-        return neighbours;
     }
 
-    public boolean useGreedy(List<NeighbourStrategy> neighbours) {
+    private boolean useGreedy() {
         Collections.shuffle(neighbours, rand);
         for (NeighbourStrategy neighbour : neighbours) {
             int delta = neighbour.evaluate();
@@ -86,7 +162,7 @@ public class LocalSearch extends Strategy {
         return false;
     }
 
-    public boolean useSteepest(List<NeighbourStrategy> neighbours) {
+    private boolean useSteepest() {
         int lowestDelta = 0;
         NeighbourStrategy bestNeighbour = null;
 
@@ -116,15 +192,42 @@ public class LocalSearch extends Strategy {
                 ")";
     }
 
-    public void setInitialStrategy(Strategy initialStrategy) {
-        this.initialStrategy = initialStrategy;
-    }
+    public static final class Builder {
+        private Strategy initialStrategy;
+        private NeighbourStrategy intraRouteStrategy;
+        private LSType lsType;
+        private boolean useCandidateMoves = false;
+        private boolean useCache = false;
 
-    public void setIntraRouteStrategy(NeighbourStrategy intraRouteStrategy) {
-        this.intraRouteStrategy = intraRouteStrategy;
-    }
+        public Builder() {}
 
-    public void setLsType(LSType lsType) {
-        this.lsType = lsType;
+        public Builder initialStrategy(Strategy initialStrategy) {
+            this.initialStrategy = initialStrategy;
+            return this;
+        }
+
+        public Builder intraRouteStrategy(NeighbourStrategy intraRouteStrategy) {
+            this.intraRouteStrategy = intraRouteStrategy;
+            return this;
+        }
+
+        public Builder lsType(LSType lsType) {
+            this.lsType = lsType;
+            return this;
+        }
+
+        public Builder useCandidateMoves(boolean useCandidateMoves) {
+            this.useCandidateMoves = useCandidateMoves;
+            return this;
+        }
+
+        public Builder useCache(boolean useCache) {
+            this.useCache = useCache;
+            return this;
+        }
+
+        public LocalSearch build() {
+            return new LocalSearch(initialStrategy, intraRouteStrategy, lsType, useCandidateMoves, useCache);
+        }
     }
 }
