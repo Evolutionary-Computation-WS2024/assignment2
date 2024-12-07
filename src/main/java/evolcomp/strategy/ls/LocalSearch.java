@@ -25,7 +25,8 @@ public class LocalSearch extends Strategy {
     private NeighbourStrategy lastAppliedNeighbour;
 
     // TODO: Refactor
-    private List<NeighbourStrategy> lm;
+//    private List<NeighbourStrategy> lm;
+    private Set<NeighbourStrategy> lm;
 
     public LocalSearch(Strategy initialStrategy, IntraRouteNeighbour intraRouteStrategy, LSType lsType) {
         this.initialStrategy = initialStrategy;
@@ -71,7 +72,7 @@ public class LocalSearch extends Strategy {
 
     private Cycle useSteepestWithPreviousDeltas() {
         boolean hasImproved = true;
-        lm = new SortedList<>(Comparator.comparingInt(NeighbourStrategy::evaluate));
+        lm = new TreeSet<>(Comparator.comparingInt(NeighbourStrategy::evaluate));
 
         while (hasImproved) {
             hasImproved = false;
@@ -113,7 +114,17 @@ public class LocalSearch extends Strategy {
                 if (lastAppliedNeighbour instanceof InterRouteNeighbour inter) {
 
                 } else if (lastAppliedNeighbour instanceof IntraRouteNeighbour intra) {
+                    // one of the edges was deleted
                     if (!intra.allEdgesExist(bestSolution)) {
+                        it.remove();
+
+                    // removed edges have opposite returns
+                    } else if (false) {
+
+
+                    // removed edges have the same return
+                    } else {
+                        bestSolution = intra.buildNeighbour();
                         it.remove();
                     }
                 }

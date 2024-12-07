@@ -49,16 +49,15 @@ public abstract class NeighbourStrategy {
         } else {
             nextNodeID = nodesList.get(0);
         }
-        
+
         int gains = this.instance.getCostAt(nodesList.get(nodePositionIndexInRoute));
-        int costs = this.instance.getCostAt(nodeID);
-        
         gains += this.instance.getDistanceBetween(prevNodeID, nodesList.get(nodePositionIndexInRoute));
         gains += this.instance.getDistanceBetween(nextNodeID, nodesList.get(nodePositionIndexInRoute));
-        
+
+        int costs = this.instance.getCostAt(nodeID);
         costs +=  this.instance.getDistanceBetween(prevNodeID, nodeID);
         costs +=  this.instance.getDistanceBetween(nextNodeID, nodeID);
-        
+
         int delta = costs - gains;
         this.evaluationResult = delta;
         return delta;

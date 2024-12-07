@@ -88,6 +88,12 @@ public final class TwoNodesExchangeNeighbour
         return new TwoNodesExchangeNeighbour(instance, currentSolution, first, second);
     }
 
+    // TODO: Implement
+    @Override
+    public boolean areEdgesOppositeTo(Cycle cycle) {
+        return true;
+    }
+
     @Override
     public boolean isValid(int first, int second) {
         return first != second;

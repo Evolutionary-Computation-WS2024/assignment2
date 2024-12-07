@@ -10,4 +10,14 @@ public sealed interface IntraRouteNeighbour
     boolean isValid(int a, int b);
 
     NeighbourStrategy construct(TSPInstance tsp, Cycle bestSolution, int i, int j);
+
+    /**
+     * Actually returns this neighbour as a cycle object and sets it as ThisNeighbor
+     */
+    Cycle buildNeighbour();
+
+    /**
+     * Checks whether the return of edges are opposite
+     */
+    boolean areEdgesOppositeTo(Cycle solution);
 }

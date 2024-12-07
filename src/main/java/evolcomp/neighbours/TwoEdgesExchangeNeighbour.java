@@ -90,6 +90,12 @@ public final class TwoEdgesExchangeNeighbour
         return new Cycle(neighbourAsList);
     }
 
+    // TODO: Implement
+    @Override
+    public boolean areEdgesOppositeTo(Cycle solution) {
+        return false;
+    }
+
     @Override
     public boolean isValid(int first, int second) {
         int distance = Math.abs(first - second);
