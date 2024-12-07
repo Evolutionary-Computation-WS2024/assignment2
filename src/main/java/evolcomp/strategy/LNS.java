@@ -4,9 +4,12 @@
  */
 package evolcomp.strategy;
 
+import evolcomp.strategy.NNToAnyUtils.Path;
 import evolcomp.strategy.ls.LocalSearch;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,7 +28,7 @@ public class LNS extends Strategy{
         Cycle x = randomSolutionGenerator.apply(tspInstance,startNode);
         int scoreX = tspInstance.evaluate(x);
         
-        while(System.currentTimeMillis() - start < 100) {
+        while(System.currentTimeMillis() - start < 32699) {
             Cycle y = destroy(x);
             y = repair(y, tspInstance);
             this.noMainLoopRuns += 1;
@@ -42,10 +45,37 @@ public class LNS extends Strategy{
         return this.noMainLoopRuns;
     }
     protected Cycle repair(Cycle y, TSPInstance tspInstance) {
-        return y;
+        Path path = new Path(y, tspInstance);
+        for (int i = y.nodes().size(); i < tspInstance.getRequiredCycleLength(); i++) {
+            path.extend();
+        }
+        //System.out.println("reapired");
+        //System.out.println(path.toList());
+        return new Cycle(path.toList());
     }
     protected Cycle destroy(Cycle x) {
-        return x;
+        List<Integer> nodesList = new ArrayList<>(x.nodes());
+        //System.out.println("inital");
+        //System.out.println(nodesList);
+        removeRandomSublist(nodesList,0.25);
+        //System.out.println("broken");
+        //System.out.println(nodesList);
+        return new Cycle(nodesList);
+    }
+    protected void removeRandomSublist(List<Integer> cycleList, double percentage) {
+        int size = cycleList.size();
+        int sublistSize = (int) Math.ceil(size * percentage);
+        int startIndex = this.randomGenerator.nextInt(size);
+        
+        List<Integer> newList = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            if (i < startIndex || i >= (startIndex + sublistSize) % size) {
+                newList.add(cycleList.get(i));
+            }
+        }
+        cycleList.clear();
+        cycleList.addAll(newList);
     }
     @Override
     public String toString() {

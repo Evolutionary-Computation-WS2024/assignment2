@@ -23,7 +23,7 @@ public class LNSwithLS extends LNS {
         Cycle x = LS.apply(tspInstance, -1); //the int argument should be nothing, but couldn't assign null
         int scoreX = tspInstance.evaluate(x);
         
-        while(System.currentTimeMillis() - start < 100) {
+        while(System.currentTimeMillis() - start < 32699) {
             Cycle y = destroy(x);
             y = repair(y, tspInstance);
             LS.setIntitialSolution(y);

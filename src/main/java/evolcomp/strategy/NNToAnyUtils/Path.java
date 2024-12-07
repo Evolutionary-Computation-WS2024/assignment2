@@ -4,6 +4,7 @@
  */
 package evolcomp.strategy.NNToAnyUtils;
 
+import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,19 +21,18 @@ public class Path {
     public final int regret_weight;
     public final int utility_weight;
     
-    public Path(int starting_point, TSPInstance tspInstance, int regret_weight, int utility_weight) {
+    // TODO
+    public Path(Cycle brokenSolution, TSPInstance tspInstance) {
         this.tspInstance = tspInstance;
         int no_nodes = tspInstance.getHowManyNodes();
         this.remaining_nodes = new HashSet<>();
         for (int i = 0; i < no_nodes; i++) {
             this.remaining_nodes.add(i); // Add numbers from 0 to n-1
         }
-        
-        this.starting_node = new Node(starting_point);
-        this.remaining_nodes.remove(starting_point);
+        readCycle(brokenSolution);
         this.comparator = new ExtensionComparator();
-        this.regret_weight  =  regret_weight;
-        this.utility_weight = utility_weight;
+        this.regret_weight  =  -1;
+        this.utility_weight = -1;
     }
     public void extend() {
         // initialize any solution for comaprison
@@ -81,5 +81,22 @@ public class Path {
             current_node = current_node.getNext();
         }
         return list;
+    }
+    private void readCycle(Cycle cycle) {
+        List<Integer> cycleNodes = cycle.nodes();
+        int firstNodeId = cycleNodes.get(0);
+        this.remaining_nodes.remove(firstNodeId);
+        this.starting_node = new Node(firstNodeId);
+        Node prev = this.starting_node;
+        for (int i = 1; i < cycleNodes.size(); i++) {
+            int nexNodeId = cycleNodes.get(i);
+            this.remaining_nodes.remove(nexNodeId);
+            Extension extension = new Extension(this.tspInstance, prev, nexNodeId, this);
+            extension.add_to_the_patch();
+            prev = prev.getNext();
+        }
+        //System.out.println("transcripted");
+        //System.out.println(this.toList());
+        //prev.setNext(this.starting_node);
     }
  }
