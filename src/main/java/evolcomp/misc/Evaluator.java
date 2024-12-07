@@ -17,21 +17,23 @@ public final class Evaluator {
     private long minTimeMs = Long.MAX_VALUE;
     private long maxTimeMs = Long.MIN_VALUE;
     private long averageTimeMs;
+    private int averageLsRuns;
 
     public Evaluator(TSPInstance instance, Strategy strategy) {
         this.instance = instance;
         this.strategy = strategy;
         execute();
     }
-
+    
     private void execute() {
         int totalValue = 0;
-        for (int i=0; i<instance.getHowManyNodes(); i++) {
+        this.averageLsRuns = 0;
+        for (int i=0; i<20; i++) {
             long start = System.nanoTime();
             Cycle currentCycle = strategy.apply(instance, i);
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;
             averageTimeMs += elapsedMs;
-
+            averageLsRuns += strategy.getNoMainLoopRuns();
             if (elapsedMs > maxTimeMs) {
                 maxTimeMs = elapsedMs;
             }
@@ -50,8 +52,9 @@ public final class Evaluator {
             }
             totalValue += currentValue;
         }
-        averageValue = totalValue / instance.getHowManyNodes();
-        averageTimeMs = averageTimeMs / instance.getHowManyNodes();
+        averageValue = totalValue / 20;
+        averageTimeMs = averageTimeMs / 20;
+        averageLsRuns = averageLsRuns / 20;
     }
 
     public int getAverageValue() {
@@ -80,5 +83,9 @@ public final class Evaluator {
 
     public long getAverageTimeMs() {
         return averageTimeMs;
+    }
+    
+    public int getAverageMainRuns() {
+        return averageLsRuns;
     }
 }

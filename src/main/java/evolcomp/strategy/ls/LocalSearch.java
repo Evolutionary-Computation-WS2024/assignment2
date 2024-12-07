@@ -1,12 +1,14 @@
 package evolcomp.strategy.ls;
 
 import evolcomp.strategy.Strategy;
+import static evolcomp.strategy.ls.LSType.STEEPEST;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
 import neighbours.InterRouteNeighbour;
 import neighbours.NeighbourStrategy;
 
 import java.util.*;
+import neighbours.TwoEdgesExchangeNeighbour;
 
 public class LocalSearch extends Strategy {
     private Strategy initialStrategy;
@@ -17,18 +19,23 @@ public class LocalSearch extends Strategy {
 
     private TSPInstance tsp;
     private Cycle bestSolution;
+    private Cycle intitialSolution;
 
 
-    public LocalSearch(Strategy initialStrategy, NeighbourStrategy intraRouteStrategy, LSType lsType) {
-        this.initialStrategy = initialStrategy;
-        this.intraRouteStrategy = intraRouteStrategy;
-        this.lsType = lsType;
+    public LocalSearch(Cycle intitialSolution) {
+        this.intraRouteStrategy = new TwoEdgesExchangeNeighbour();
+        this.lsType = STEEPEST;
+        this.intitialSolution = intitialSolution;
+    }
+    
+    public void setIntitialSolution(Cycle solution) {
+        this.intitialSolution = solution;
     }
 
     @Override
     public Cycle apply(TSPInstance tspInstance, int startNode) {
         this.tsp = tspInstance;
-        bestSolution = initialStrategy.apply(tspInstance, startNode);
+        bestSolution = intitialSolution;
         boolean hasImproved = true;
 
         while (hasImproved) {
