@@ -7,17 +7,18 @@ public sealed interface IntraRouteNeighbour
         permits TwoEdgesExchangeNeighbour, TwoNodesExchangeNeighbour {
 
     boolean allEdgesExist(Cycle bestSolution);
-    boolean isValid(int a, int b);
+    boolean isValid(int a, int b, int cycleLength);
 
-    NeighbourStrategy construct(TSPInstance tsp, Cycle bestSolution, int i, int j);
+    NeighbourStrategy construct(TSPInstance tsp, Cycle currentSolution, int i, int j, boolean oppositeEdges);
 
     /**
      * Actually returns this neighbour as a cycle object and sets it as ThisNeighbor
+     * @param previousSolution Previous solution
      */
-    Cycle buildNeighbour();
+    Cycle buildNeighbour(Cycle previousSolution);
 
     /**
      * Checks whether the return of edges are opposite
      */
-    boolean areEdgesOppositeTo(Cycle solution);
+    boolean edgesContainSameReturns(Cycle solution);
 }

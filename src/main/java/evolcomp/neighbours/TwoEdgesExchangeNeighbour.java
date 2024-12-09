@@ -7,16 +7,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * O -- A1 -- B1 -- O
+ * O -- a1 -- b1 -- O
  * |                |
- * O -- B2 -- A2 -- O
+ * O -- b2 -- a2 -- O
  * 
  *         |
  *         V
  * 
- * O -- A1   B1 -- O
+ * O -- a1   b1 -- O
  * |       X       |
- * O -- B2   A2 -- O
+ * O -- b2   a2 -- O
  * 
  * @author Jerzu, Siemieniuk
  */
@@ -24,26 +24,17 @@ public final class TwoEdgesExchangeNeighbour
     extends NeighbourStrategy
         implements IntraRouteNeighbour {
 
-    private final int A1Index;
-    private final int A2Index;
-    private final int B1Index;
-    private final int B2Index;
-    
-    private final int A1;
-    private final int A2;
-    private final int B1;
-    private final int B2;
+    private final int a1;
+    private final int a2;
+    private final int b1;
+    private final int b2;
 
     public TwoEdgesExchangeNeighbour() {
         super();
-        this.A1Index = 0;
-        this.A2Index = 0;
-        this.B1Index = 0;
-        this.B2Index = 0;
-        this.A1 = -1;
-        this.A2 = -1;
-        this.B1 = -1;
-        this.B2 = -1;
+        this.a1 = -1;
+        this.a2 = -1;
+        this.b1 = -1;
+        this.b2 = -1;
     }
     
     public TwoEdgesExchangeNeighbour(
@@ -52,54 +43,67 @@ public final class TwoEdgesExchangeNeighbour
             int firstEdgeStartingNodePositionIndexInRoute,
             int secondEdgeStartingNodePositionIndexInRoute)
     {
-        super(instance, currentSolution);
+        this(instance, currentSolution, firstEdgeStartingNodePositionIndexInRoute, secondEdgeStartingNodePositionIndexInRoute, true);
+    }
 
-        if (!isValid(firstEdgeStartingNodePositionIndexInRoute, secondEdgeStartingNodePositionIndexInRoute)) {
+    public TwoEdgesExchangeNeighbour(
+            TSPInstance instance,
+            Cycle currentSolution,
+            int firstEdgeStartingNodePositionIndexInRoute,
+            int secondEdgeStartingNodePositionIndexInRoute,
+            boolean oppositeEdges)
+    {
+        super(instance);
+
+        if (!isValid(firstEdgeStartingNodePositionIndexInRoute, secondEdgeStartingNodePositionIndexInRoute, instance.getRequiredCycleLength())) {
             throw new IllegalArgumentException("Minimal distance between two entries must be 2!");
         }
 
-        this.A1Index = firstEdgeStartingNodePositionIndexInRoute;
-        this.A2Index = secondEdgeStartingNodePositionIndexInRoute;
-        this.B1Index = (A1Index + 1)%currentSolution.getNodes().size();
-        this.B2Index = (A2Index + 1)%currentSolution.getNodes().size();
+        int a1Index = firstEdgeStartingNodePositionIndexInRoute;
+        int a2Index = secondEdgeStartingNodePositionIndexInRoute;
+        int b1Index = (a1Index + 1)%currentSolution.getNodes().size();
+        int b2Index = (a2Index + 1)%currentSolution.getNodes().size();
 
-        this.A1 = currentSolution.getNodes().get(A1Index);
-        this.A2 = currentSolution.getNodes().get(A2Index);
-        this.B1 = currentSolution.getNodes().get(B1Index);
-        this.B2 = currentSolution.getNodes().get(B2Index);
+        if (oppositeEdges) {
+            int swap = a1Index;
+            a1Index = a2Index;
+            a2Index = swap;
+        }
+
+        this.a1 = currentSolution.getNodes().get(a1Index);
+        this.a2 = currentSolution.getNodes().get(a2Index);
+        this.b1 = currentSolution.getNodes().get(b1Index);
+        this.b2 = currentSolution.getNodes().get(b2Index);
     }
 
     @Override
-    public int evaluate() {
+    public int evaluate(Cycle solution) {
         int costs = 0;
         int gains = 0;
-        costs += instance.getDistanceBetween(A1, A2);
-        costs += instance.getDistanceBetween(B1, B2);
+        costs += tsp.getDistanceBetween(a1, a2);
+        costs += tsp.getDistanceBetween(b1, b2);
 
-        gains += instance.getDistanceBetween(A1, B1);
-        gains += instance.getDistanceBetween(A2, B2);
+        gains += tsp.getDistanceBetween(a1, b1);
+        gains += tsp.getDistanceBetween(a2, b2);
 
-        int delta = costs - gains;
-        this.evaluationResult = delta;
+        delta = costs - gains;
         return delta;
     }
 
     @Override
-    public Cycle buildNeighbour() {
-        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.getNodes(), B1Index, A2Index);
+    public Cycle buildNeighbour(Cycle previousSolution) {
+        int b1Index = previousSolution.getIndexOfElement(b1);
+        int a2Index = previousSolution.getIndexOfElement(a2);
+
+        List<Integer> neighbourAsList = reverseSubList(previousSolution.getNodes(), b1Index, a2Index);
+
         return new Cycle(neighbourAsList);
     }
 
-    // TODO: Implement
     @Override
-    public boolean areEdgesOppositeTo(Cycle solution) {
-        return false;
-    }
-
-    @Override
-    public boolean isValid(int first, int second) {
+    public boolean isValid(int first, int second, int cycleLength) {
         int distance = Math.abs(first - second);
-        return distance >= 2;
+        return distance >= 2 && distance <= cycleLength - 2;
     }
 
     /**
@@ -122,8 +126,20 @@ public final class TwoEdgesExchangeNeighbour
     }
 
     @Override
-    public TwoEdgesExchangeNeighbour construct(TSPInstance instance, Cycle currentSolution, int first, int second) {
-        return new TwoEdgesExchangeNeighbour(instance, currentSolution, first, second);
+    public boolean allEdgesExist(Cycle bestSolution) {
+        boolean doesFirstEdgeExist = bestSolution.areNodesNextToEachOther(a1, b1);
+        boolean doesSecondEdgeExist = bestSolution.areNodesNextToEachOther(a2, b2);
+        return doesFirstEdgeExist && doesSecondEdgeExist;
+    }
+
+    @Override
+    public boolean edgesContainSameReturns(Cycle solution) {
+        return solution.edgesContainSameReturns(a1, b1, a2, b2);
+    }
+
+    @Override
+    public NeighbourStrategy construct(TSPInstance tsp, Cycle currentSolution, int i, int j, boolean oppositeEdges) {
+        return new TwoEdgesExchangeNeighbour(tsp, currentSolution, i, j, oppositeEdges);
     }
 
     @Override
@@ -131,9 +147,35 @@ public final class TwoEdgesExchangeNeighbour
         return "2-Edges";
     }
 
-    // TODO: Implement
+    public int getIdxA1(Cycle solution) {
+        return solution.getIndexOfElement(a1);
+    }
+
+    public int getIdxA2(Cycle solution) {
+        return solution.getIndexOfElement(a2);
+    }
+
+    public int getIdxB1(Cycle solution) {
+        return solution.getIndexOfElement(b1);
+    }
+
+    public int getIdxB2(Cycle solution) {
+        return solution.getIndexOfElement(b2);
+    }
+
     @Override
-    public boolean allEdgesExist(Cycle bestSolution) {
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof TwoEdgesExchangeNeighbour that)) return false;
+
+        return a1 == that.a1 && a2 == that.a2 && b1 == that.b1 && b2 == that.b2;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = a1;
+        result = 31 * result + a2;
+        result = 31 * result + b1;
+        result = 31 * result + b2;
+        return result;
     }
 }

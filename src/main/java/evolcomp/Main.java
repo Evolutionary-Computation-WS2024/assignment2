@@ -9,14 +9,12 @@ import evolcomp.strategy.*;
 import evolcomp.strategy.ls.LSType;
 import evolcomp.strategy.ls.LocalSearch;
 import evolcomp.tsp.TSPInstance;
-import evolcomp.neighbours.NeighbourStrategy;
 import evolcomp.neighbours.TwoEdgesExchangeNeighbour;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -30,25 +28,19 @@ public class Main {
         System.out.println("| Instance | Strategy                                  | f(x) [avg (min - max)]         | time in ms [avg (min - max)]   |");
         System.out.println(delim);
 
-        String fmt = "| %-8s | %-41s | %-8d (%-8d - %-8d) | %-8d (%-8d - %-8d) |%n";
+        String fmt = "\r| %-8s | %-41s | %-8d (%-8d - %-8d) | %-8d (%-8d - %-8d) |%n";
         List<SolutionRow> solutions = new ArrayList<>();
 
         for (TSPInstance tspInstance : tspInstances) {
-//            Strategy ls = new LocalSearch.Builder()
-//                    .initialStrategy(initialStrategy)
-//                    .intraRouteStrategy(neighStrategy)
-//                    .lsType(LSType.STEEPEST)
-//                    .usePreviousDeltas(true)
-//                    .build();
-
+            // FINAL VERSION
             Strategy ls = new LocalSearch.Builder()
                     .initialStrategy(initialStrategy)
                     .intraRouteStrategy(neighStrategy)
-                    .lsType(LSType.GREEDY)
-                    .useCandidateMoves(true)
+                    .lsType(LSType.STEEPEST)
+                    .usePreviousDeltas(true)
                     .build();
-
-            Evaluator evaluator = new Evaluator(tspInstance, ls);
+//            Evaluator evaluator = new Evaluator(tspInstance, ls);
+            Evaluator evaluator = new Evaluator(tspInstance, ls, true);
 
             String methodName = ls.toString();
             String instanceName = tspInstance.toString();

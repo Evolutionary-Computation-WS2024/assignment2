@@ -5,18 +5,19 @@ import evolcomp.tsp.TSPInstance;
 import java.util.List;
 
 public abstract class NeighbourStrategy {
-    public int evaluationResult;
-    protected final Cycle currentSolution;
-    protected final TSPInstance instance;
+//    protected final Cycle currentSolution;
+    protected final TSPInstance tsp;
+    protected int delta = 0;
 
     public NeighbourStrategy() {
-        this.currentSolution = null;
-        this.instance = null;
+//        this.currentSolution = null;
+        this.tsp = null;
     }
 
-    public NeighbourStrategy(TSPInstance instance, Cycle currentSolution) {
-        this.instance = instance;
-        this.currentSolution = currentSolution;
+//    public NeighbourStrategy(TSPInstance instance, Cycle currentSolution) {
+    public NeighbourStrategy(TSPInstance tsp) {
+        this.tsp = tsp;
+//        this.currentSolution = currentSolution;
     }
 
     /** 
@@ -24,52 +25,49 @@ public abstract class NeighbourStrategy {
     * negative delta -> neighbour is better than current solution
     * positive delta -> neighbour is worse than current solution
     */
-    public abstract int evaluate();
+    public abstract int evaluate(Cycle solution);
 
     /**
      * Actually returns this neighbour as a cycle object and sets it as ThisNeighbor
      */
-    public abstract Cycle buildNeighbour();
+    public abstract Cycle buildNeighbour(Cycle previousSolution);
 
     /**
     * returns utility delta for substituting the given node on the given place in a cycle
     */
-    protected final int getNodeInsertionDelta(int nodeID, int nodePositionIndexInRoute) {
-        List<Integer> nodesList = currentSolution.getNodes();
+    protected final int getNodeInsertionDelta(Cycle solution, int nodeTsp, int nodeSolutionIdx) {
+        List<Integer> nodesList = solution.getNodes();
         int lastNodeIndex = nodesList.size() - 1;
-        int prevNodeID, nextNodeID;
-        
-        if (nodePositionIndexInRoute != 0) {
-            prevNodeID = nodesList.get(nodePositionIndexInRoute - 1);     
+        int nodeSolutionTsp = nodesList.get(nodeSolutionIdx);
+
+        int prevNodeTsp;
+        if (nodeSolutionIdx != 0) {
+            prevNodeTsp = nodesList.get(nodeSolutionIdx - 1);
         } else {
-            prevNodeID = nodesList.get(lastNodeIndex);
-        }
-        if (nodePositionIndexInRoute != lastNodeIndex) {
-            nextNodeID = nodesList.get(nodePositionIndexInRoute + 1);     
-        } else {
-            nextNodeID = nodesList.get(0);
+            prevNodeTsp = nodesList.get(lastNodeIndex);
         }
 
-        int gains = this.instance.getCostAt(nodesList.get(nodePositionIndexInRoute));
-        gains += this.instance.getDistanceBetween(prevNodeID, nodesList.get(nodePositionIndexInRoute));
-        gains += this.instance.getDistanceBetween(nextNodeID, nodesList.get(nodePositionIndexInRoute));
+        int nextNodeTsp;
+        if (nodeSolutionIdx != lastNodeIndex) {
+            nextNodeTsp = nodesList.get(nodeSolutionIdx + 1);
+        } else {
+            nextNodeTsp = nodesList.get(0);
+        }
 
-        int costs = this.instance.getCostAt(nodeID);
-        costs +=  this.instance.getDistanceBetween(prevNodeID, nodeID);
-        costs +=  this.instance.getDistanceBetween(nextNodeID, nodeID);
 
-        int delta = costs - gains;
-        this.evaluationResult = delta;
+        int gains = tsp.getCostAt(nodeSolutionTsp);
+        gains += tsp.getDistanceBetween(prevNodeTsp, nodeSolutionTsp);
+        gains += tsp.getDistanceBetween(nextNodeTsp, nodeSolutionTsp);
+
+        int costs = tsp.getCostAt(nodeTsp);
+        costs +=  tsp.getDistanceBetween(prevNodeTsp, nodeTsp);
+        costs +=  tsp.getDistanceBetween(nextNodeTsp, nodeTsp);
+
+        delta = costs - gains;
         return delta;
     }
 
-    /**
-     * Checks whether this can be successfully applied to the current solution
-     */
-    // TODO: Implement
-    public boolean canBeAppliedTo(Cycle cycle) {
-        return true;
+    public int getDelta() {
+        return delta;
     }
-
-    public abstract NeighbourStrategy construct(TSPInstance instance, Cycle currentSolution, int first, int second);
 }
