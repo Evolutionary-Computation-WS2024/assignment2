@@ -21,9 +21,12 @@ public final class TSPInstance {
         this.howManyNodes = points.size();
         this.requiredCycleLength = (points.size() + 1) / 2;
         this.name = null;
+
         populatePoints(points);
         populateDistances();
-        populateNearestNeighbors(10);
+
+        final int DEFAULT_NEIGHBOURS_COUNT = 10;
+        populateNearestNeighbors(DEFAULT_NEIGHBOURS_COUNT);
     }
 
     public TSPInstance(List<Point> points, String name) {
@@ -74,9 +77,7 @@ public final class TSPInstance {
         // add cost of last node
         nodesCost += getCostAt(prev);
 
-        int totalCost = nodesCost + edgesCost;
-
-        return totalCost;
+        return nodesCost + edgesCost;
     }
 
     public int getDistanceBetween(final int x, final int y) {
@@ -146,12 +147,12 @@ public final class TSPInstance {
         }
     }
     
-    public Set<Integer> getNearestNeighbors(int pointID) {
-    // Validate input
-    if (pointID < 0 || pointID >= howManyNodes) {
-        throw new IllegalArgumentException("Point index must be between 0 and " + (howManyNodes - 1) + " (pointIndex=" + pointID + " was provided)");
-    }
-    return nearestNeighbors.get(pointID);
+    public Set<Integer> getNearestNeighbors(int tspNode) {
+        // Validate input
+        if (tspNode < 0 || tspNode >= howManyNodes) {
+            throw new IllegalArgumentException("Point index must be between 0 and " + (howManyNodes - 1) + " (pointIndex=" + tspNode + " was provided)");
+        }
+        return nearestNeighbors.get(tspNode);
     }
     // Returns number of nodes for this TSP instance
     public int getHowManyNodes() {
