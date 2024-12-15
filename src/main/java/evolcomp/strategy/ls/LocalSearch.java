@@ -337,13 +337,24 @@ public class LocalSearch extends Strategy {
 
     @Override
     public String toString() {
-        return "Local Search (" +
-                initialStrategy.toString() +
-                ", " +
-                lsType +
-                ", " +
-                intraRouteStrategy.toString() +
-                ")";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append("LS (")
+                .append(initialStrategy.toString())
+                .append(", ")
+                .append(lsType)
+                .append(", ")
+                .append(intraRouteStrategy.toString());
+
+        if (useCandidateMoves) {
+            stringBuilder.append(", Cand_Modes");
+        }
+        if (usePreviousDeltas) {
+            stringBuilder.append(", Prev_Deltas");
+        }
+
+        stringBuilder.append(")");
+        return stringBuilder.toString();
     }
 
     public static final class Builder {

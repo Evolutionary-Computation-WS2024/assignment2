@@ -127,8 +127,8 @@ public final class TwoEdgesExchangeNeighbour
 
     @Override
     public boolean allEdgesExist(Cycle bestSolution) {
-        boolean doesFirstEdgeExist = bestSolution.areNodesNextToEachOther(a1, b1);
-        boolean doesSecondEdgeExist = bestSolution.areNodesNextToEachOther(a2, b2);
+        boolean doesFirstEdgeExist = bestSolution.areNodesAdjacentByCycleIdx(a1, b1);
+        boolean doesSecondEdgeExist = bestSolution.areNodesAdjacentByCycleIdx(a2, b2);
         return doesFirstEdgeExist && doesSecondEdgeExist;
     }
 

@@ -41,14 +41,15 @@ public class InterRouteNeighbour extends NeighbourStrategy {
             return false;
         }
 
-        boolean firstEdgeExists = solution.areNodesNextToEachOther(prevNodeValue, oldNodeValue);
-        boolean secondEdgeExists = solution.areNodesNextToEachOther(oldNodeValue, nextNodeValue);
+        boolean firstEdgeExists = solution.areNodesAdjacentByCycleIdx(prevNodeValue, oldNodeValue);
+        boolean secondEdgeExists = solution.areNodesAdjacentByCycleIdx(oldNodeValue, nextNodeValue);
         return firstEdgeExists && secondEdgeExists;
     }
 
     @Override
     public Cycle buildNeighbour(Cycle previousSolution) {
         List<Integer> nodesListCopy = new ArrayList<>(previousSolution.getNodes());
+
         int oldNodeIdx = previousSolution.getIndexOfElement(oldNodeValue);
         nodesListCopy.set(oldNodeIdx, newNodeValue);
         return new Cycle(nodesListCopy);
