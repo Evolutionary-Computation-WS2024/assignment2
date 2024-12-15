@@ -29,14 +29,12 @@ public class Main {
 
         // Create combinations of Greedy-Steepest
         List<LSType> types = List.of(
-                LSType.GREEDY,
-                LSType.STEEPEST
+                LSType.GREEDY
         );
 
         // Create combinations of initial solution method
         List<Strategy> initialSolutionMethods = List.of(
-                new RandomStrategy(42),
-                new GreedyCycleWithRegret(-1, -1)
+                new RandomStrategy(42)
         );
 
 

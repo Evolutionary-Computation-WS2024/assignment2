@@ -36,7 +36,7 @@ public abstract class NeighbourStrategy {
     * returns utility delta for substituting the given node on the given place in a cycle
     */
     protected int getNodeInsertionDelta(int nodeID, int nodePositionIndexInRoute) {
-        List<Integer> nodesList = this.currentSolution.nodes();
+        List<Integer> nodesList = this.currentSolution.nodes;
         int lastNodeIndex = nodesList.size() - 1;
         int prevNodeID, nextNodeID;
         

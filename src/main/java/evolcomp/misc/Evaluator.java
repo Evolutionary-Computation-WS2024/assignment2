@@ -3,6 +3,10 @@ package evolcomp.misc;
 import evolcomp.strategy.Strategy;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import neighbours.NeighbourStrategy;
 
 public final class Evaluator {
     private final TSPInstance instance;
@@ -17,6 +21,8 @@ public final class Evaluator {
     private long minTimeMs = Long.MAX_VALUE;
     private long maxTimeMs = Long.MIN_VALUE;
     private long averageTimeMs;
+    
+    private List<Cycle> solutions = new ArrayList<>();
 
     public Evaluator(TSPInstance instance, Strategy strategy) {
         this.instance = instance;
@@ -26,10 +32,15 @@ public final class Evaluator {
 
     private void execute() {
         int totalValue = 0;
-        for (int i=0; i<instance.getHowManyNodes(); i++) {
+        for (int i=0; i<100; i++) {
+            Random randomNumberGenerator = new Random();
+            
             long start = System.nanoTime();
-            Cycle currentCycle = strategy.apply(instance, i);
+            Cycle currentCycle = strategy.apply(instance, randomNumberGenerator.nextInt(200));
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+            
+            this.solutions.add(bestCycle);
+            
             averageTimeMs += elapsedMs;
 
             if (elapsedMs > maxTimeMs) {
@@ -53,6 +64,8 @@ public final class Evaluator {
         averageValue = totalValue / instance.getHowManyNodes();
         averageTimeMs = averageTimeMs / instance.getHowManyNodes();
     }
+    
+    
 
     public int getAverageValue() {
         return averageValue;

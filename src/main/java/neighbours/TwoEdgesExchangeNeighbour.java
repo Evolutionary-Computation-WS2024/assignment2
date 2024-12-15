@@ -57,13 +57,13 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
         
         this.A1Index = firstEdgeStartingNodePositionIndexInRoute;
         this.A2Index = secondEdgeStartingNodePositionIndexInRoute;
-        this.B1Index = (A1Index + 1)%currentSolution.nodes().size();
-        this.B2Index = (A2Index + 1)%currentSolution.nodes().size();
+        this.B1Index = (A1Index + 1)%currentSolution.nodes.size();
+        this.B2Index = (A2Index + 1)%currentSolution.nodes.size();
         
-        this.A1 = currentSolution.nodes().get(A1Index);
-        this.A2 = currentSolution.nodes().get(A2Index);
-        this.B1 = currentSolution.nodes().get(B1Index);
-        this.B2 = currentSolution.nodes().get(B2Index);
+        this.A1 = currentSolution.nodes.get(A1Index);
+        this.A2 = currentSolution.nodes.get(A2Index);
+        this.B1 = currentSolution.nodes.get(B1Index);
+        this.B2 = currentSolution.nodes.get(B2Index);
     }
     
     @Override
@@ -83,7 +83,7 @@ public class TwoEdgesExchangeNeighbour extends NeighbourStrategy {
 
     @Override
     public Cycle buildNeighbour() {
-        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.nodes(),B1Index, A2Index);
+        List<Integer> neighbourAsList = reverseSubList(this.currentSolution.nodes,B1Index, A2Index);
         Cycle neighbour = new Cycle(neighbourAsList);
         this.ThisNeighbor = neighbour;
         return neighbour;
