@@ -127,7 +127,7 @@ public final class TSPInstance {
         for (int i = 0; i < howManyNodes; i++) {
             // each element in pq is an int[] array, a[0] = neighbor’s index, a[1] = neighbor’s distance
             // a -> a[1] lambda expression idicates that distance will be used for comaprison
-            PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+            PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt((int[] a) -> a[1]).reversed());
             // entrySet()returns a Set of Map.Entry objects
             for (Map.Entry<Integer, Integer> entry : distances.get(i).entrySet()) {
                 int neighborIndex = entry.getKey();
