@@ -22,22 +22,6 @@ public class Main {
     public static void main(String[] args) throws IOException, URISyntaxException {
         List<TSPInstance> tspInstances = readTSPInstances();
 
-        // Create combinations of Intra-Route strategies
-        List<NeighbourStrategy> intraRouteStrategies = new ArrayList<>();
-        intraRouteStrategies.add(new TwoEdgesExchangeNeighbour());
-        intraRouteStrategies.add(new TwoNodesExchangeNeighbour());
-
-        // Create combinations of Greedy-Steepest
-        List<LSType> types = List.of(
-                LSType.GREEDY
-        );
-
-        // Create combinations of initial solution method
-        List<Strategy> initialSolutionMethods = List.of(
-                new RandomStrategy(42)
-        );
-
-
         String delim = "|----------|-------------------------------------------|--------------------------------|--------------------------------|";
         System.out.println(delim);
         System.out.println("| Instance | Strategy                                  | f(x) [avg (min - max)]         | time in ms [avg (min - max)]   |");
@@ -47,10 +31,7 @@ public class Main {
         List<SolutionRow> solutions = new ArrayList<>();
 
         for (TSPInstance tspInstance : tspInstances) {
-            for (LSType type : types) {
-                for (Strategy initial : initialSolutionMethods) {
-                    for (NeighbourStrategy neigh : intraRouteStrategies) {
-                        LocalSearch ls = new LocalSearch(initial, neigh, type);
+                        LocalSearch ls = new LocalSearch(new RandomStrategy(42), new TwoEdgesExchangeNeighbour(), LSType.GREEDY);
                         Evaluator evaluator = new Evaluator(tspInstance, ls);
 
                         String methodName = ls.toString();
@@ -69,9 +50,6 @@ public class Main {
 
                         SolutionRow row = new SolutionRow(methodName, instanceName, bestSolution);
                         solutions.add(row);
-                    }
-                }
-            }
         }
 
         System.out.println(delim);

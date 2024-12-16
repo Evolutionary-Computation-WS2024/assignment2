@@ -1,6 +1,10 @@
 package evolcomp.misc;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import evolcomp.strategy.Strategy;
+import evolcomp.strategy.ls.LSType;
 import evolcomp.tsp.Cycle;
 import evolcomp.tsp.TSPInstance;
 import java.util.ArrayList;
@@ -24,22 +28,26 @@ public final class Evaluator {
     
     private List<Cycle> solutions = new ArrayList<>();
 
-    public Evaluator(TSPInstance instance, Strategy strategy) {
+    public Evaluator(TSPInstance instance, Strategy strategy) throws IOException {
         this.instance = instance;
         this.strategy = strategy;
         execute();
+        this.computeAwerageSimilarity();
+        this.computeSimilarityToBest(bestCycle);
+        String path = this.instance.toString() + ".csv";
+        exportToCsv(this.solutions, path);
     }
 
     private void execute() {
         int totalValue = 0;
-        for (int i=0; i<100; i++) {
+        for (int i=0; i<1000; i++) {
             Random randomNumberGenerator = new Random();
             
             long start = System.nanoTime();
             Cycle currentCycle = strategy.apply(instance, randomNumberGenerator.nextInt(200));
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;
             
-            this.solutions.add(bestCycle);
+            this.solutions.add(currentCycle);
             
             averageTimeMs += elapsedMs;
 
@@ -52,6 +60,7 @@ public final class Evaluator {
             }
 
             int currentValue = instance.evaluate(currentCycle);
+            currentCycle.setScore(currentValue);
             if (currentValue > maxValue) {
                 maxValue = currentValue;
             }
@@ -63,9 +72,8 @@ public final class Evaluator {
         }
         averageValue = totalValue / instance.getHowManyNodes();
         averageTimeMs = averageTimeMs / instance.getHowManyNodes();
-    }
-    
-    
+              
+    }  
 
     public int getAverageValue() {
         return averageValue;
@@ -93,5 +101,41 @@ public final class Evaluator {
 
     public long getAverageTimeMs() {
         return averageTimeMs;
+    }
+    
+    private void computeSimilarityToBest(Cycle bestSolution) {
+        for(Cycle solution : solutions) {
+            solution.setSimmilarityBestEdge(solution.computeSimmilarityEdges(bestSolution));
+            solution.setSimmilarityBestNode(solution.computeSimmilarityNodes(bestSolution));
+        }        
+    }
+    
+    private void computeAwerageSimilarity() {
+        for(int i = 0; i<this.solutions.size(); i++) {
+            Cycle solution1 = solutions.get(i);
+            float similaritesSumEdge = 0;
+            float similaritesSumNode = 0;
+            for(int j = 0; j<this.solutions.size(); j++) {
+                if(i!=j) {
+                    Cycle solution2 = solutions.get(j);
+                    similaritesSumEdge += solution1.computeSimmilarityEdges(solution2);
+                    similaritesSumNode += solution1.computeSimmilarityNodes(solution2);
+                }
+            }
+            float avgEdge = (float) similaritesSumEdge/(solutions.size()-1);
+            float avgNode = (float) similaritesSumNode/(solutions.size()-1);
+            solution1.setSimmilarityAvgEdge(avgEdge);
+            solution1.setSimmilarityAvgNode(avgNode);
+        } 
+    }
+    public static void exportToCsv(List<Cycle> cycles, String filePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write("score;simmilarityAvgEdge;simmilarityAvgNode;simmilarityBestEdge;simmilarityBestNode");
+            writer.newLine();
+            for (Cycle cycle : cycles) {
+                writer.write(cycle.toCsvRow());
+                writer.newLine();
+            }
+        }
     }
 }

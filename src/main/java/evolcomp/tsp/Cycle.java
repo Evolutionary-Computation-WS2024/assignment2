@@ -8,8 +8,10 @@ import java.util.stream.Collectors;
 public class Cycle {
     public final List<Integer> nodes;
     private int score;
-    private int simmilarityAvg;
-    private int simmilarityBest;
+    private float setSimmilarityAvgEdge;
+    private float setSimmilarityAvgNode;
+    private float simmilarityBestEdge;
+    private float simmilarityBestNode;
     
     // Constructor
     public Cycle(List<Integer> nodes) {
@@ -24,16 +26,22 @@ public class Cycle {
     public void setScore(int a) {
         this.score = a;
     }
-    public void setSimmilarityAvg(int a) {
-        this.simmilarityAvg = a;
+    public void setSimmilarityAvgEdge(float a) {
+        this.setSimmilarityAvgEdge = a;
     }
-    public void setSimmilarityBest(int a) {
-        this.simmilarityBest = a;
+    public void setSimmilarityAvgNode(float a) {
+        this.setSimmilarityAvgNode = a;
+    }
+    public void setSimmilarityBestEdge(float a) {
+        this.simmilarityBestEdge = a;
+    }
+    public void setSimmilarityBestNode(float a) {
+        this.simmilarityBestNode = a;
     }
     public String toCsvRow() {
-        return simmilarityAvg + ";" + simmilarityBest;
+        return score + ";" + setSimmilarityAvgEdge + ";" + setSimmilarityAvgNode + ";" + simmilarityBestEdge + ";" + simmilarityBestNode;
     } 
-    public int computeSimmilarityNodes(Cycle other) {
+    public float computeSimmilarityNodes(Cycle other) {
         if (other == null) {
             throw new IllegalArgumentException("Other cycle cannot be null");
         }
@@ -41,9 +49,9 @@ public class Cycle {
         Set<Integer> otherNodesSet = new HashSet<>(other.nodes);
 
         thisNodesSet.retainAll(otherNodesSet); // Retain only common nodes
-        return thisNodesSet.size()/otherNodesSet.size();
+        return (float) thisNodesSet.size()/otherNodesSet.size();
     }
-    public int computeSimmilarityEdges(Cycle other) {
+    public float computeSimmilarityEdges(Cycle other) {
         if (other == null) {
             throw new IllegalArgumentException("Other cycle cannot be null");
         }
@@ -52,10 +60,9 @@ public class Cycle {
         Set<String> otherEdgesSet = getEdgesSet(other.nodes);
 
         thisEdgesSet.retainAll(otherEdgesSet); // Retain only common edges
-        return thisEdgesSet.size()/otherEdgesSet.size();
+        return (float) thisEdgesSet.size()/otherEdgesSet.size();
     }
 
-    // Helper method to get a set of edges as strings
     private Set<String> getEdgesSet(List<Integer> nodes) {
         Set<String> edges = new HashSet<>();
         int size = nodes.size();
@@ -64,7 +71,6 @@ public class Cycle {
             int from = nodes.get(i);
             int to = nodes.get((i + 1) % size); // Wrap around to form a cycle
 
-            // Store edges in a consistent order (smallest node first)
             edges.add(from < to ? from + "-" + to : to + "-" + from);
         }
 
